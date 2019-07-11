@@ -17,6 +17,59 @@ embedded_instances {
   "    w: 1.0\n"
   "  }\n"
   "}\n"
+  "components {\n"
+  "  id: \"tiles\"\n"
+  "  component: \"/main/tiles.tilemap\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "go2"
+  data: "embedded_components {\n"
+  "  id: \"factory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/path.go\\\"\\n"
+  "load_dynamically: false\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "}\n"
   ""
   position {
     x: 0.0
@@ -37,14 +90,9 @@ embedded_instances {
 }
 embedded_instances {
   id: "go1"
-  data: "embedded_components {\n"
-  "  id: \"sprite\"\n"
-  "  type: \"sprite\"\n"
-  "  data: \"tile_set: \\\"/main/test.atlas\\\"\\n"
-  "default_animation: \\\"blob_idle_1\\\"\\n"
-  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
-  "blend_mode: BLEND_MODE_ALPHA\\n"
-  "\"\n"
+  data: "components {\n"
+  "  id: \"test\"\n"
+  "  component: \"/main/test.gui\"\n"
   "  position {\n"
   "    x: 0.0\n"
   "    y: 0.0\n"
@@ -59,8 +107,8 @@ embedded_instances {
   "}\n"
   ""
   position {
-    x: 389.0
-    y: 263.0
+    x: 0.0
+    y: 0.0
     z: 0.0
   }
   rotation {
