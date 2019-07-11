@@ -1,0 +1,6 @@
+images {
+  image: "/main/gfx/blob_idle_1.png"
+}
+margin: 0
+extrude_borders: 2
+inner_padding: 0

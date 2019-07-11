@@ -1,0 +1,135 @@
+local map = {
+	0,1,2,0,0,2,1,2,1,0,2,2,1,1,1,0,2,1,1,1,0,1,1,2,2,1,1,2,0,2,2,2,
+	2,1,0,2,2,0,1,2,2,2,1,1,1,1,2,1,1,0,2,2,0,0,0,0,2,2,0,0,0,0,2,1,
+	1,2,0,2,2,2,0,1,0,2,2,1,1,2,2,0,1,1,2,2,1,2,2,1,0,2,1,2,1,2,1,1,
+	2,2,0,0,0,1,1,0,0,2,0,0,2,1,0,1,2,1,2,2,1,0,2,2,2,2,2,0,0,2,0,1,
+	1,0,1,2,1,1,2,2,2,1,1,2,0,1,1,2,2,2,0,0,2,0,1,2,1,2,2,2,0,1,0,0,
+	0,1,0,1,2,1,0,1,2,1,1,0,2,1,2,1,1,0,1,2,2,2,1,2,2,0,0,2,1,1,1,0,
+	1,0,1,0,0,1,0,1,0,0,1,1,1,0,1,1,2,1,0,1,0,1,2,1,0,2,0,2,1,1,0,1,
+	2,2,1,2,0,1,2,1,1,1,0,1,2,0,2,0,0,0,0,0,1,0,2,1,0,0,1,1,1,2,0,1,
+	0,0,2,1,1,1,0,1,1,1,2,2,0,1,2,0,1,2,1,0,2,0,1,2,1,1,0,0,0,2,1,2,
+	2,1,0,0,2,2,0,0,1,2,2,1,1,2,0,1,0,2,2,0,1,2,1,1,1,1,1,2,0,0,1,2,
+	2,2,2,0,2,0,0,1,1,1,0,0,1,1,2,2,2,1,2,1,1,0,1,0,1,1,1,2,1,2,0,1,
+	1,1,0,1,2,0,1,2,2,2,0,0,0,0,0,1,0,2,2,2,0,2,2,1,1,0,0,0,0,2,1,2,
+	1,2,2,1,2,0,0,2,1,1,0,2,1,2,0,0,0,1,1,0,0,1,0,1,0,2,1,0,1,2,1,2,
+	0,0,1,0,0,1,1,0,2,2,2,2,1,1,2,1,2,2,2,2,0,1,1,2,1,0,0,2,2,0,0,0,
+	0,1,2,0,2,2,0,2,2,2,1,1,2,0,0,1,1,2,1,0,1,1,1,0,1,2,1,1,2,2,0,2,
+	0,2,0,2,0,0,0,1,1,2,1,1,1,2,0,1,2,2,2,2,0,1,1,2,2,1,2,2,1,1,0,0,
+	1,0,1,1,2,1,0,0,2,1,2,0,1,0,1,0,2,1,2,0,1,2,1,2,1,2,2,1,2,0,2,0,
+	2,2,2,2,2,1,2,0,1,2,2,0,0,1,2,2,1,1,2,1,0,2,2,2,0,1,0,1,1,2,2,2,
+	0,0,2,1,2,1,0,0,1,2,2,0,0,0,0,2,1,0,1,2,0,1,1,1,0,1,1,1,0,0,2,2,
+	2,0,1,1,2,0,1,0,0,0,1,0,2,0,0,2,0,1,2,0,1,0,1,1,2,0,2,2,2,1,1,1,
+	2,0,0,0,1,2,2,2,0,1,2,2,2,2,1,1,1,1,0,1,0,2,0,1,1,2,2,0,0,1,0,0,
+	2,0,2,2,2,2,1,1,1,2,2,0,2,0,1,0,1,2,2,2,0,0,2,2,1,1,0,1,1,2,2,2,
+	2,0,0,0,2,0,1,0,0,0,2,2,2,1,0,1,2,2,2,1,0,1,0,1,0,2,2,0,1,0,1,0,
+	0,0,2,0,2,0,1,0,0,0,1,2,2,0,2,1,1,1,0,1,2,1,1,2,0,1,2,0,2,0,1,1,
+	1,2,1,1,1,1,0,1,1,1,1,0,0,2,2,1,0,1,0,1,1,0,1,1,2,2,0,0,0,2,0,0,
+	1,2,0,0,1,0,1,0,0,1,1,0,1,0,1,2,0,1,2,1,2,0,2,1,1,0,1,2,2,1,0,2,
+	0,2,0,1,2,2,1,1,1,2,1,2,1,0,1,2,2,2,1,0,1,0,1,2,2,0,2,0,0,0,0,0,
+	0,2,2,0,2,2,2,1,2,2,1,1,1,0,2,0,1,1,0,2,0,0,0,0,2,0,1,2,1,1,0,1,
+	1,1,2,1,1,1,0,0,1,2,0,2,1,2,1,1,1,0,0,2,2,0,0,1,0,2,0,2,1,0,2,2,
+	0,2,0,2,2,0,0,1,1,0,2,1,2,1,1,2,0,2,2,2,0,0,0,0,0,1,0,0,0,1,2,1,
+	0,2,0,1,0,0,2,2,1,0,0,1,1,2,2,0,0,0,2,2,0,0,2,2,0,2,0,1,2,0,1,1,
+	0,1,0,1,0,1,2,0,2,2,2,2,0,0,2,0,0,1,1,1,0,0,2,0,1,0,1,0,1,2,0,2
+}
+local costs = {
+	[0] = {
+		1.0,
+		1.0,
+		1.0,
+		1.0,
+		1.41,
+		1.41,
+		1.41,
+		1.41
+	},
+	[2] = {
+		2.0,
+		2.0,
+		2.0,
+		2.0,
+		2.41,
+		2.41,
+		2.41,
+		2.41
+	}
+}
+-- SETUP
+local mapWidth = 32
+local mapHeight = 32
+local direction = 8
+local allocate = mapWidth * mapHeight
+local typical_adjacent = 8
+local cache = true
+-- Solve
+local startX = 0
+local startY = 0
+local endX = 22
+local endY = 22
+
+local max_cost = 3.0 -- near
+
+function init(self)
+
+
+	astar.setup(mapWidth, mapHeight, direction, allocate, typical_adjacent, cache)
+	astar.setmap(map)
+	astar.setcosts(costs)
+
+	local result, size, totalcost, path = astar.solve(startX, startY, endX, endY)
+
+	print("result:", result)
+	print("size:", size)
+	print("totalcost:", totalcost)
+	if result == astar.SOLVED then
+		print("SOLVED")
+		for i, v in ipairs(path) do
+			print(i, v.x .. " - " .. v.y)
+		end
+	elseif result == astar.NO_SOLUTION then
+		print("NO_SOLUTION")
+	elseif result == astar.START_END_SAME then
+		print("START_END_SAME")
+	end
+
+	print("-------------------------")
+
+	local near_result, near_size, nears = astar.solve_near(startX, startY, max_cost)
+	print("near_result:", near_result)
+	print("near_size:", near_size)
+
+	if near_result == astar.SOLVED then
+		print("SOLVED")
+		for i, v in ipairs(nears) do
+			print(i, v.x .. " - " .. v.y, v.cost)
+		end
+	elseif near_result == astar.NO_SOLUTION then
+		print("NO_SOLUTION")
+	elseif near_result == astar.START_END_SAME then
+		print("START_END_SAME")
+	end
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	
+end
+
+function on_message(self, message_id, message, sender)
+	-- Add message-handling code here
+	-- Remove this function if not needed
+end
+
+function on_input(self, action_id, action)
+	-- Add input-handling code here
+	-- Remove this function if not needed
+end
+
+function on_reload(self)
+	-- Add reload-handling code here
+	-- Remove this function if not needed
+end

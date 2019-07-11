@@ -1,0 +1,14 @@
+name: "astar"
+
+platforms:
+ x86_64-osx:
+  context:
+   flags:      ["-std=c++11"]
+
+ arm64-ios:
+  context:
+   flags:      ["-std=c++11"]
+
+ armv7-ios:
+  context:
+   flags:      ["-std=c++11"]
