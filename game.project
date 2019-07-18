@@ -4,10 +4,6 @@ main_collection = /main/main.collectionc
 [script]
 shared_state = 1
 
-[display]
-width = 1280
-height = 720
-
 [android]
 input_method = HiddenInputField
 
