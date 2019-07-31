@@ -57,7 +57,7 @@ astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache)
 
 ### astar.set_map(world)
 
-Set your map table.
+Set your map data.
 
 ```lua
 local world = {
@@ -73,4 +73,100 @@ astar.set_map(world)
 
 ### astar.set_costs(costs)
 
-Set costs for your world table.
+Set costs for your walkable tiles on your world table. Costs table key determine the walkable area. In this example only 2 numbered tiles are walkable.   
+
+Cost's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`. In this example we want to move 8 direction. 
+
+```lua
+local costs = {
+    [2] = {
+        1.0, -- E
+        1.0, -- N
+        1.0, -- W
+        1.0, -- S
+        1.41, -- NE
+        1.41, -- NW
+        1.41, -- SW
+        1.41 -- SE
+    }
+}
+
+astar.set_costs(costs)
+```
+
+### astar.solve(start_x, start_y, end_x, end_y)
+
+Solves the path.   
+Returns multiple values:
+
+##### result
+**astar.SOLVED**: Path solved  
+**astar.NO_SOLUTION**: Can't find the path  
+**astar.START_END_SAME**: Start and End is the same 
+
+##### size
+Size of the path.
+
+##### total_cost
+Total cost of the path
+
+##### path
+Path table with x and y coordinates. First value is the given start point.
+
+```lua
+local start_x = 1
+local start_y = 1
+local end_x = 3
+local end_y = 3
+
+local result, size, total_cost, path = astar.solve(start_x, start_y, end_x, end_y)
+
+if result == astar.SOLVED then
+	print("SOLVED")
+	for i, v in ipairs(path) do
+		print("Tile: ", v.x .. "-" .. v.y)
+	end
+elseif result == astar.NO_SOLUTION then
+	print("NO_SOLUTION")
+elseif result == astar.START_END_SAME then
+	print("START_END_SAME")
+end
+```
+
+### astar.solve_near(start_x, start_y, max_cost)
+
+Finds the neighbours according to given cost. First value is the given start point.  
+Returns multiple values:
+
+##### near_result
+**astar.SOLVED**: Path solved  
+**astar.NO_SOLUTION**: Can't find the path  
+**astar.START_END_SAME**: Start and End is the same 
+
+##### near_size
+Size of the found neighbours.
+
+
+##### nears
+Neighbours table with x and y coordinates
+
+```lua
+local start_x = 1
+local start_y = 1
+local end_x = 3
+local end_y = 3
+
+local near_result, near_size, nears = astar.solve_near(start_x, start_y, max_cost)
+
+if near_result == astar.SOLVED then
+	print("SOLVED")
+	for i, v in ipairs(nears) do
+		print("Tile: ", v.x .. "-" .. v.y)
+	end
+elseif near_result == astar.NO_SOLUTION then
+	print("NO_SOLUTION")
+elseif near_result == astar.START_END_SAME then
+	print("START_END_SAME")
+end
+```
+### astar.reset

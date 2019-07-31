@@ -832,10 +832,10 @@ local typical_adjacent = 8
 local cache = true
 
 -- Solve
-local startX = 1
-local startY = 18
-local endX = 17
-local endY = 2
+local start_x = 1
+local start_y = 18
+local end_x = 17
+local end_y = 2
 local max_cost = 3.0 -- near
 
 function init(self)
@@ -843,10 +843,10 @@ function init(self)
     astar.set_map(world)
     astar.set_costs(costs)
 
-    local result, size, totalcost, path = astar.solve(startX, startY, endX, endY)
+    local result, size, total_cost, path = astar.solve(start_x, start_y, end_x, end_y)
 
     print("size:", size)
-    print("totalcost:", totalcost)
+    print("total_cost:", total_cost)
 
     if result == astar.SOLVED then
         print("SOLVED")
@@ -861,7 +861,7 @@ function init(self)
 
     print("-------------------------")
 
-    local near_result, near_size, nears = astar.solve_near(startX, startY, max_cost)
+    local near_result, near_size, nears = astar.solve_near(start_x, start_y, max_cost)
 
     print("near_size:", near_size)
 
