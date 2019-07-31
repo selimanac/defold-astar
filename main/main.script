@@ -795,8 +795,8 @@ local costs = {
     }
 }
 -- SETUP
-local mapWidth = 39
-local mapHeight = 20
+local map_width = 39
+local map_height = 20
 local direction = astar.DIRECTION_EIGHT
 
 --[[
@@ -815,7 +815,7 @@ local direction = astar.DIRECTION_EIGHT
          - If your state space is huge, use a multiple (5-10x) of the normal
          path. "Occasionally" call astar.reset_cache() to free unused memory.
 ]]
-local allocate = mapWidth * mapHeight
+local allocate = map_width * map_height
 
 --[[ 
         typicalAdjacent: Used to determine cache size. The typical number of adjacent states
@@ -839,7 +839,7 @@ local endY = 2
 local max_cost = 3.0 -- near
 
 function init(self)
-    astar.setup(mapWidth, mapHeight, direction, allocate, typical_adjacent, cache)
+    astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache)
     astar.set_map(world)
     astar.set_costs(costs)
 
