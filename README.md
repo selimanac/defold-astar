@@ -169,4 +169,7 @@ elseif near_result == astar.START_END_SAME then
 	print("START_END_SAME")
 end
 ```
-### astar.reset
+### astar.reset_cache()
+
+If your state space is huge, occasionally call astar.reset_cache() to free unused memory.
+
