@@ -23,10 +23,10 @@ Width of your map. This is generally width of your tilemap.
 ##### map_height
 Height of your map. This is generally width of your tilemap.
 
-#####direction
+##### direction  
 Movement direction. You have two options:  
-**astar.DIRECTION_FOUR**: On a square grid that allows 4 directions of movement using Manhattan distance  
-**astar.DIRECTION_EIGHT**: On a square grid that allows 8 directions of movement using Euclidean distance
+**astar.DIRECTION_FOUR**: On a square grid that allows 4 directions of movement using [Manhattan distance](http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#manhattan-distance)  
+**astar.DIRECTION_EIGHT**: On a square grid that allows 8 directions of movement using [Euclidean distance](http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#euclidean-distance)
 
 ##### allocate
 How many states should be internally allocated at a time. This can be hard to get correct. The higher the value, the more memory Patfinder will use.
@@ -45,5 +45,32 @@ Turn on path caching. Uses more memory (yet again) but at a huge speed advantage
 
 
 ```lua
-player.build_path("<FULL_PATH>/res/common/assets/") -- Set build path when working on Editor only s
+local map_width = 5
+local map_height = 5
+local direction = astar.DIRECTION_EIGHT
+local allocate = map_width * map_height
+local typical_adjacent = 8
+local cache = true
+
+astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache)
 ```
+
+### astar.set_map(world)
+
+Set your map table.
+
+```lua
+local world = {
+2 ,2 ,0 ,1 ,0,
+0 ,0 ,1 ,2 ,1,
+0 ,0 ,2 ,0 ,0,
+0 ,2 ,2 ,2 ,2,
+2 ,1 ,1 ,0 ,1
+}
+
+astar.set_map(world)
+```
+
+### astar.set_costs(costs)
+
+Set costs for your world table.
