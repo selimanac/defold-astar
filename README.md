@@ -141,7 +141,7 @@ end
 
 ### astar.solve_near(start_x, start_y, max_cost)
 
-Finds the neighbours according to given cost. First value is the given start point.  
+Finds the neighbours according to given cost.   
 Returns multiple values:
 
 ##### near_result
@@ -154,7 +154,8 @@ Size of the found neighbours.
 
 
 ##### nears
-Table with x and y coordinates
+Table with x and y coordinates. First value is the given start point.  
+
 
 ```lua
 local start_x = 1
