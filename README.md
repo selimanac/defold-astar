@@ -1,4 +1,4 @@
-![ModPlayer](https://github.com/selimanac/defold-modplayer/blob/master/assets/defoldheader.png?raw=true)
+![A*](https://github.com/selimanac/defold-astar/blob/master/assets/defoldheader.png?raw=true)
 
 This is a path finder and A* solver (astar or a-star) native extension for [Defold Engine](https://www.defold.com/) build on [MicroPather](https://github.com/leethomason/MicroPather). 
 
