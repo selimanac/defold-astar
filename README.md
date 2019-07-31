@@ -79,9 +79,9 @@ astar.set_map(world)
 
 ### astar.set_costs(costs)
 
-Set costs for your walkable tiles on your world table. Costs table keyes determine the walkable area. In this example only numbered "2" tiles are walkable.   
+Set costs for your walkable tiles on your `world` table. This table keys determines the walkable area. In this example only numbered "2" tiles are walkable.   
 
-Cost's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`. In this example we want to move 8 direction. 
+Table's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`. In this example we want to move 8 direction. 
 
 ```lua
 local costs = {
@@ -117,7 +117,7 @@ Size of the path.
 Total cost of the path
 
 ##### path
-Path table with x and y coordinates. First value is the given start point.
+Table with x and y coordinates. First value is the given start point.
 
 ```lua
 local start_x = 1
@@ -154,7 +154,7 @@ Size of the found neighbours.
 
 
 ##### nears
-Neighbours table with x and y coordinates
+Table with x and y coordinates
 
 ```lua
 local start_x = 1
