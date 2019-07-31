@@ -46,12 +46,7 @@
 #include <float.h>
 #include <string.h>
 
-#ifdef _DEBUG
-#ifndef DEBUG
 
-#define DEBUG
-#endif
-#endif
 
 
 #if defined(DEBUG)

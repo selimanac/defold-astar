@@ -1,14 +1,25 @@
 name: "astar"
 
 platforms:
- x86_64-osx:
-  context:
-   flags:      ["-std=c++11"]
+  x86_64-osx:
+    context:
+      flags:      ["-std=c++11"]
 
- arm64-ios:
-  context:
-   flags:      ["-std=c++11"]
+  arm64-ios:
+    context:
+      flags:      ["-std=c++11"]
 
- armv7-ios:
-  context:
-   flags:      ["-std=c++11"]
+  armv7-ios:
+    context:
+      flags:      ["-std=c++11"]
+
+  x86_64-win32: 
+    context:
+      flags:      ["-std=c++11"]
+
+  js-web : 
+    context:
+      flags:      ["-std=c++11","-stdlib=libc++"]
+
+
+      

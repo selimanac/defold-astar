@@ -18,6 +18,7 @@ void Map::ResetPath()
 {
     pather->Reset();
 }
+
 void Map::ClearPath()
 {
     path.resize(0);
@@ -70,6 +71,7 @@ float Map::LeastCostEstimate( void* nodeStart, void* nodeEnd )
         return (float) sqrt( (double)(nx * nx) + (double)(ny * ny) );
     } else {
         //Diagonal distance <- Not using
+        // 1.41 -> cost
         return (nx + ny) + (1.41 - 2 * 1) * fmin(nx, ny);
     }
 }
@@ -91,7 +93,9 @@ void Map::AdjacentCost( void* node, MPVector<StateCost > *neighbors )
             if ( pass == Costs[a].tile_id )
             {
                 if (WorldAt( nx, ny ) >= 0) {
-                    nodeCost = { XYToNode( nx, ny ), Costs[a].costs[b] };
+                 //   nodeCost = { XYToNode( nx, ny ), Costs[a].costs[b] };
+                    nodeCost.state = XYToNode( nx, ny );
+                    nodeCost.cost = Costs[a].costs[b];
                     neighbors->push_back( nodeCost );
                 }
             }
@@ -149,7 +153,7 @@ int Map::SolveNear(float maxCost){
         return result;
     }
     
-    result = pather->SolveForNearStates(XYToNode(pathFrom.x, pathFrom.y), &near, maxCost);
+    result = pather->SolveForNearStates(XYToNode(pathFrom.x, pathFrom.y), &nears, maxCost);
     
     return result;
 }

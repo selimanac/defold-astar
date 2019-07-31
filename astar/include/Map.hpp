@@ -26,10 +26,7 @@ private:
     
     MicroPather* pather;
     
-    enum Direction
-    {   DIRECTION_FOUR = 4,
-        DIRECTION_EIGHT = 8
-    };
+    
     
     // E: 1/0
     // N: 0/1
@@ -53,7 +50,7 @@ public:
     Position pathFrom = {0,0};
     Position pathTo = {5,5};
     MPVector<void*> path;
-    MPVector<StateCost> near;
+    MPVector<StateCost> nears;
     Tile* Costs;
     
     Map(){};
@@ -64,6 +61,11 @@ public:
         SOLVED,
         NO_SOLUTION,
         START_END_SAME,
+    };
+
+    enum Direction
+    {   DIRECTION_FOUR = 4,
+        DIRECTION_EIGHT = 8
     };
     
     void Setup(int _worldWidth, int _worldHeight, int _worldDirection, int _allocate, int _typicalAdjacent, bool _cache);

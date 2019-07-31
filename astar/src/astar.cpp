@@ -1,9 +1,11 @@
 #define LIB_NAME "Astar"
 #define MODULE_NAME "astar"
-
+#define DLIB_LOG_DOMAIN "ASTAR"
 #include <Map.hpp>
 #include <dmsdk/sdk.h>
-
+#include <dmsdk/dlib/log.h>
+#include <stdio.h>
+#include <cstdlib>
 
 Map map;
 int x, y;
@@ -68,6 +70,7 @@ static int astar_setcosts(lua_State *L)
     lua_pushnil(L);
     while (lua_next(L, 1) != 0)
     {
+
         map.Costs[id].tile_id = lua_tointeger(L, -2);
 
         if (lua_istable(L, -1))
@@ -78,9 +81,16 @@ static int astar_setcosts(lua_State *L)
             lua_pushnil(L);
             while (lua_next(L, -2) != 0)
             {
+
                 map.Costs[id].costs[cost_id] = lua_tonumber(L, -1);
                 lua_pop(L, 1);
                 cost_id++;
+
+                if (cost_id > map.worldDirection)
+                {
+                    dmLogError("There are more costs than direction. Cost Count: %i, Direction: %i", cost_id, map.worldDirection);
+                    return 0;
+                }
             }
         }
         lua_pop(L, 1);
@@ -156,7 +166,7 @@ static int astar_solvenear(lua_State *L)
 
     pathResult = map.SolveNear(maxCost);
 
-    size = map.near.size();
+    size = map.nears.size();
 
     lua_pushinteger(L, pathResult);
     lua_pushinteger(L, size);
@@ -168,7 +178,7 @@ static int astar_solvenear(lua_State *L)
         int newTable = lua_gettop(L);
         for (int i = 0; i < size; i++)
         {
-            map.NodeToXY(map.near[i].state, &x, &y);
+            map.NodeToXY(map.nears[i].state, &x, &y);
 
             lua_createtable(L, 2, 0);
             lua_pushstring(L, "x");
@@ -178,7 +188,7 @@ static int astar_solvenear(lua_State *L)
             lua_pushinteger(L, y);
             lua_settable(L, -3);
             lua_pushstring(L, "cost");
-            lua_pushnumber(L, map.near[i].cost);
+            lua_pushnumber(L, map.nears[i].cost);
             lua_settable(L, -3);
 
             lua_rawseti(L, newTable, i + 1);
@@ -194,8 +204,8 @@ static const luaL_reg Module_methods[] =
         {"reset", astar_reset},
         {"clear_path", astar_clearpath},
         {"reset_cache", astar_resetcache},
-        {"setcosts", astar_setcosts},
-        {"setmap", astar_setmap},
+        {"set_costs", astar_setcosts},
+        {"set_map", astar_setmap},
         {"setup", astar_setup},
         {0, 0}
 
@@ -208,13 +218,21 @@ static void LuaInit(lua_State *L)
     // Register lua names
     luaL_register(L, MODULE_NAME, Module_methods);
 
-    #define SETCONSTANT(name)                   \
-  lua_pushnumber(L, (lua_Number)Map::name); \
-  lua_setfield(L, -2, #name);
+#define SETCONSTANT(name)                     \
+    lua_pushnumber(L, (lua_Number)Map::name); \
+    lua_setfield(L, -2, #name);
 
     SETCONSTANT(SOLVED);
     SETCONSTANT(NO_SOLUTION);
     SETCONSTANT(START_END_SAME);
+#undef SETCONSTANT
+
+#define SETCONSTANT(name)                     \
+    lua_pushnumber(L, (lua_Number)Map::name); \
+    lua_setfield(L, -2, #name);
+
+    SETCONSTANT(DIRECTION_FOUR);
+    SETCONSTANT(DIRECTION_EIGHT);
 #undef SETCONSTANT
 
     lua_pop(L, 1);
