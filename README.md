@@ -2,7 +2,9 @@
 
 This is a path finder and A* solver (astar or a-star) native extension for [Defold Engine](https://www.defold.com/) build on [MicroPather](https://github.com/leethomason/MicroPather). 
 
-**Caution:** This extension is not battle tested yet and you should consider it as alpha release. It may contain bugs.
+**Caution**   
+This extension is not battle tested yet and you should consider it as alpha release. It may contain bugs.   
+Currently it supports one map at the same time. I have no plans to improve it. Feel free to contribute.
 
 ## Installation
 
