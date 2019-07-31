@@ -2,8 +2,6 @@
 
 This is a path finder and A* solver (astar or a-star) native extension for [Defold Engine](https://www.defold.com/) build on [MicroPather](https://github.com/leethomason/MicroPather). 
 
-**Examples:** https://github.com/selimanac/defold-astar-examples
-
 **Caution:** This extension is not battle tested yet and you should consider it as alpha release. It may contain bugs.
 
 ## Installation
@@ -13,6 +11,10 @@ Open your game.project file and in the dependencies field under project add:
 
 >https://github.com/selimanac/defold-astar/archive/master.zip
 
+
+## Examples
+
+https://github.com/selimanac/defold-astar-examples
 
 ## API
 
@@ -75,7 +77,7 @@ astar.set_map(world)
 
 ### astar.set_costs(costs)
 
-Set costs for your walkable tiles on your world table. Costs table key determine the walkable area. In this example only numbered "2" tiles are walkable.   
+Set costs for your walkable tiles on your world table. Costs table keyes determine the walkable area. In this example only numbered "2" tiles are walkable.   
 
 Cost's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`. In this example we want to move 8 direction. 
 
@@ -155,8 +157,7 @@ Neighbours table with x and y coordinates
 ```lua
 local start_x = 1
 local start_y = 1
-local end_x = 3
-local end_y = 3
+local max_cost = 3.0 -- near
 
 local near_result, near_size, nears = astar.solve_near(start_x, start_y, max_cost)
 
