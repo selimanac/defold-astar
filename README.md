@@ -63,7 +63,8 @@ astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache)
 
 ### astar.set_map(world)
 
-Set your map data.
+Set your map data.  
+*Setting new map data reset the current cache.
 
 ```lua
 local world = {
@@ -82,6 +83,8 @@ astar.set_map(world)
 Set costs for your walkable tiles on your `world` table. This table keys determines the walkable area. In this example only numbered "2" tiles are walkable.   
 
 Table's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`. In this example we want to move 8 direction. 
+
+*Setting new cost data reset the current cache.
 
 ```lua
 local costs = {
