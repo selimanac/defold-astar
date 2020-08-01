@@ -501,6 +501,7 @@ MicroPather::~MicroPather()
 void MicroPather::Reset()
 {
 	pathNodePool.Clear();
+	
 	if ( pathCache ) {
 		pathCache->Reset();
 	}

@@ -4,7 +4,7 @@
 #include <micropather.h>
 #include <stdio.h>
 #include <math.h>
-
+#include <dmsdk/sdk.h>
 using namespace micropather;
 
 typedef struct {
@@ -24,7 +24,7 @@ private:
     Map(const Map&);
     void operator=(const Map&);
     
-    MicroPather* pather;
+    MicroPather* pather = NULL;
     
     
     

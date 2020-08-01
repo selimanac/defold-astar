@@ -6,7 +6,7 @@
 #include <dmsdk/dlib/log.h>
 #include <stdio.h>
 #include <cstdlib>
-
+//test
 Map map;
 int x, y;
 float maxCost;
@@ -117,6 +117,7 @@ static int astar_reset(lua_State *L)
     return 0;
 }
 
+
 static int astar_solve(lua_State *L)
 {
     int i = 3;
@@ -129,6 +130,13 @@ static int astar_solve(lua_State *L)
 
     size = map.path.size();
 
+     // Early exit if only found itself
+    if (size == 1)
+    {
+        pathResult = Map::NO_SOLUTION;
+        size = 0;
+    }
+
     lua_pushinteger(L, pathResult);
     lua_pushinteger(L, size);
     lua_pushnumber(L, map.totalCost);
@@ -138,9 +146,9 @@ static int astar_solve(lua_State *L)
         i++;
         lua_createtable(L, size, 0);
         int newTable = lua_gettop(L);
-        for (int i = 0; i < size; i++)
+        for (int ii = 0; ii < size; ii++)
         {
-            map.NodeToXY(map.path[i], &x, &y);
+            map.NodeToXY(map.path[ii], &x, &y);
 
             lua_createtable(L, 2, 0);
             lua_pushstring(L, "x");
@@ -150,7 +158,7 @@ static int astar_solve(lua_State *L)
             lua_pushinteger(L, y);
             lua_settable(L, -3);
 
-            lua_rawseti(L, newTable, i + 1);
+            lua_rawseti(L, newTable, ii + 1);
         }
     }
 
@@ -168,6 +176,13 @@ static int astar_solvenear(lua_State *L)
 
     size = map.nears.size();
 
+    // Early exit if only found itself
+    if (size == 1)
+    {
+        pathResult = Map::NO_SOLUTION;
+        size = 0;
+    }
+
     lua_pushinteger(L, pathResult);
     lua_pushinteger(L, size);
 
@@ -176,9 +191,9 @@ static int astar_solvenear(lua_State *L)
         i++;
         lua_createtable(L, size, 0);
         int newTable = lua_gettop(L);
-        for (int i = 0; i < size; i++)
+        for (int ii = 0; ii < size; ii++)
         {
-            map.NodeToXY(map.nears[i].state, &x, &y);
+            map.NodeToXY(map.nears[ii].state, &x, &y);
 
             lua_createtable(L, 2, 0);
             lua_pushstring(L, "x");
@@ -188,10 +203,10 @@ static int astar_solvenear(lua_State *L)
             lua_pushinteger(L, y);
             lua_settable(L, -3);
             lua_pushstring(L, "cost");
-            lua_pushnumber(L, map.nears[i].cost);
+            lua_pushnumber(L, map.nears[ii].cost);
             lua_settable(L, -3);
 
-            lua_rawseti(L, newTable, i + 1);
+            lua_rawseti(L, newTable, ii + 1);
         }
     }
     return i;
