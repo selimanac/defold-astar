@@ -127,7 +127,7 @@ static int astar_solve(lua_State *L)
     map.pathTo.y = luaL_checkint(L, 4);
 
     pathResult = map.Solve();
-
+    
     size = map.path.size();
 
      // Early exit if only found itself

@@ -167,7 +167,7 @@ int Map::Solve()
     if (Costs == NULL)
     {
         dmLogError("COSTS is null: Please set costs by using astar.set_costs(costs)\n");
-        return 0;
+        return NO_SOLUTION;
     }
 
     // Early exit if start/end x-y out of the map bounds
@@ -188,7 +188,7 @@ int Map::SolveNear(float maxCost)
     if (Costs == NULL)
     {
         dmLogError("COSTS is null: Please set costs by using astar.set_costs(costs)\n");
-        return 0;
+        return NO_SOLUTION;
     }
 
     // Early exit if x-y out of the map bounds
