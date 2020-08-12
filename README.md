@@ -182,3 +182,11 @@ end
 
 If your state space is huge, occasionally call astar.reset_cache() to free unused memory.
 
+## Release notes()
+
+1.0.1  
+
+Small bug fixes. [More details](https://forum.defold.com/t/a-native-extension/60405/9?u=selimanac) 
+
+1.0  
+initial
