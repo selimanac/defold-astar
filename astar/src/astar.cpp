@@ -121,10 +121,10 @@ static int astar_reset(lua_State *L)
 static int astar_solve(lua_State *L)
 {
     int i = 3;
-    map.pathFrom.x = luaL_checkint(L, 1);
-    map.pathFrom.y = luaL_checkint(L, 2);
-    map.pathTo.x = luaL_checkint(L, 3);
-    map.pathTo.y = luaL_checkint(L, 4);
+    map.pathFrom.x = luaL_checkint(L, 1) - 1;
+    map.pathFrom.y = luaL_checkint(L, 2) - 1;
+    map.pathTo.x = luaL_checkint(L, 3) - 1;
+    map.pathTo.y = luaL_checkint(L, 4) - 1;
 
     pathResult = map.Solve();
     
@@ -152,10 +152,10 @@ static int astar_solve(lua_State *L)
 
             lua_createtable(L, 2, 0);
             lua_pushstring(L, "x");
-            lua_pushinteger(L, x);
+            lua_pushinteger(L, x + 1);
             lua_settable(L, -3);
             lua_pushstring(L, "y");
-            lua_pushinteger(L, y);
+            lua_pushinteger(L, y + 1);
             lua_settable(L, -3);
 
             lua_rawseti(L, newTable, ii + 1);
