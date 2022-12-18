@@ -132,10 +132,9 @@ local function result(near_size, near_result, nears)
 end
 
 function init(self)
-
     astar.reset()
     astar.reset_cache()
-    
+
     -- ***************************** --
     -- * Initial reset empty cache * --
     -- ***************************** --
@@ -149,19 +148,16 @@ function init(self)
     local near_result, near_size, nears = astar.solve_near(start_x, start_y, 1.5)
     result(near_size, near_result, nears)
 
-
     -- ***************************** --
     -- *    Without Reset cache    * --
     -- ***************************** --
     print("--------------------------")
 
-    -- Same w-h. No need to astar.setup. 
+    -- Same w-h. No need to astar.setup.
     -- It is closed. Should return NO_SOLUTION
     astar.set_map(world2)
     local near_result, near_size, nears = astar.solve_near(start_x, start_y, 1.5)
     result(near_size, near_result, nears)
-
-
 
     -- ***************************** --
     -- *        Reset cache        * --
@@ -170,13 +166,11 @@ function init(self)
 
     astar.reset_cache()
 
-    -- Same w-h. No need to astar.setup. 
+    -- Same w-h. No need to astar.setup.
     -- It is closed. Should return NO_SOLUTION
     astar.set_map(world2)
     local near_result, near_size, nears = astar.solve_near(start_x, start_y, 1.5)
     result(near_size, near_result, nears)
-
-
 
     -- ***************************** --
     -- *         Hard Reset        * --
@@ -195,8 +189,6 @@ function init(self)
     local near_result, near_size, nears = astar.solve_near(5, 5, 1.5)
     result(near_size, near_result, nears)
 
-
-
     -- ***************************** --
     -- *        Reset cache        * --
     -- ***************************** --
@@ -209,7 +201,6 @@ function init(self)
     astar.set_costs(costs)
     local near_result, near_size, nears = astar.solve_near(5, 5, 1.5)
     result(near_size, near_result, nears)
-
 
     -- ***************************** --
     -- *    Without Reset cache    * --
