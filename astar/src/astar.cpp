@@ -117,6 +117,24 @@ static int astar_reset(lua_State *L)
     return 0;
 }
 
+static int astar_get_at(lua_State *L)
+{
+    int x = luaL_checkint(L, 1);
+    int y = luaL_checkint(L, 2);
+    int ret = map.WorldAt(x, y);
+
+    lua_pushinteger(L, ret);
+    return 1;
+}
+
+static int astar_set_at(lua_State *L)
+{
+    int x = luaL_checkint(L, 1);
+    int y = luaL_checkint(L, 2);
+    int value = luaL_checkint(L, 3);
+    map.SetToWorldAt(x, y, value);
+    return 0;
+}
 
 static int astar_solve(lua_State *L)
 {
@@ -222,6 +240,8 @@ static const luaL_reg Module_methods[] =
         {"set_costs", astar_setcosts},
         {"set_map", astar_setmap},
         {"setup", astar_setup},
+        {"get_at", astar_get_at},
+        {"set_at", astar_set_at},
         {0, 0}
 
 };
