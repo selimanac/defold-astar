@@ -252,7 +252,7 @@ end
 ```
 
 
-## astar.set_at(`x`, `y`, 'value')
+## astar.set_at(`x`, `y`, `value`)
 
 Set your value to the map array by coordinates.
 *Setting new data reset the current cache.
