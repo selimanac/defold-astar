@@ -1,0 +1,165 @@
+- name: astar
+  type: table
+  desc: A* Path Finding
+  members:
+    - name: setup
+      desc: Initial setup.
+      type: function
+      parameters:
+        - name: map_width
+          type: number
+          desc: Width of your map. This is generally width of your tilemap.
+        - name: map_height
+          type: number
+          desc: Height of your map. This is generally width of your tilemap.
+        - name: direction
+          type: number
+          desc:
+            Movement direction (`astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`).
+
+            `astar.DIRECTION_FOUR` - on a square grid that allows 4 directions of movement using Manhattan distance.
+
+            `astar.DIRECTION_EIGHT` - on a square grid that allows 8 directions of movement using Euclidean distance.
+        - name: allocate
+          type: number
+          desc:
+            How many states should be internally allocated at a time. This can be hard to get correct. The higher the value, the more memory Patfinder will use.
+
+            - If you have a small map (a few thousand states?) it may make sense to pass in the maximum value. This will cache everything, and MicroPather will only need one main memory allocation. For a chess board, allocate  would be set to 8x8 (64)
+
+            - If your map is large, something like 1/4 the number of possible states is good.
+
+            - If your state space is huge, use a multiple (5-10x) of the normal path. "Occasionally" call `astar.reset_cache()` to free unused memory.
+        - name: typical_adjacent
+          type: number
+          desc: Used to determine cache size. The typical number of adjacent states to a given state. (On a chessboard, 8.) Higher values use a little more memory.
+        - name: cache
+          type: boolean
+          desc: Turn on path caching. Uses more memory (yet again) but at a huge speed advantage if you may call the pather with the same path or sub-path, which is common for pathing over maps in games.
+
+    - name: set_map
+      desc: Set your map data.
+
+        * Setting new map data reset the current cache.
+      type: function
+      parameters:
+        - name: world
+          type: table
+          desc: Your tilemap data. Keep it simple as much as you can.
+
+    - name: set_costs
+      desc: Set costs for walkable tiles on your `world` table. This table keys determine the walkable area.
+
+        Table's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`.
+      type: function
+      parameters:
+        - name: costs
+          type: table
+          desc: Table of costs for directions.
+
+    - name: solve
+      desc: Solves the path.
+      type: function
+      parameters:
+        - name: start_x
+          type: number
+          desc: Start tile X.
+        - name: start_y
+          type: number
+          desc: Start tile Y.
+        - name: end_x
+          type: number
+          desc: End tile X.
+        - name: end_y
+          type: number
+          desc: End tile Y.
+      returns:
+        - name: result
+          type: number
+          desc: Result code (`astar.SOLVED`, `astar.NO_SOLUTION`, `astar.START_END_SAME`).
+        - name: size
+          type: number
+          desc: Size of the path.
+        - name: total_cost
+          type: number
+          desc: Total cost of the path.
+        - name: path
+          type: table
+          desc: Table with x and y coordinates. First value is the given start point.
+
+    - name: solve_near
+      desc: Finds the neighbours according to a given cost.
+      type: function
+      parameters:
+        - name: start_x
+          type: number
+          desc: Start tile X.
+        - name: start_y
+          type: number
+          desc: Start tile Y.
+        - name: max_cost
+          type: number
+          desc: Maximum cost for finding neighbours.
+      returns:
+        - name: near_result
+          type: number
+          desc: Result code (`astar.SOLVED`, `astar.NO_SOLUTION`, `astar.START_END_SAME`).
+        - name: near_size
+          type: number
+          desc: Size of the found neighbours.
+        - name: nears
+          type: table
+          desc: Table with x and y coordinates. First value is the given start point.
+
+    - name: reset_cache
+      desc: If your state space is huge, occasionally call `astar.reset_cache()` to free unused memory.
+      type: function
+
+    - name: get_at
+      desc: Returns the value from the map array by coordinates.
+      type: function
+      parameters:
+        - name: x
+          type: number
+          desc: Tile X.
+        - name: y
+          type: number
+          desc: Tile Y.
+      returns:
+        - name: value
+          type: number
+          desc: The value at the specified coordinates.
+
+    - name: set_at
+      desc: Set your value to the map array by coordinates.
+      type: function
+      parameters:
+        - name: x
+          type: number
+          desc: Tile X.
+        - name: y
+          type: number
+          desc: Tile Y.
+        - name: value
+          type: number
+          desc: The value to set.
+
+    - name: SOLVED
+      type: number
+      desc: Represents a solved path result.
+
+    - name: NO_SOLUTION
+      type: number
+      desc: Represents a result where no path is found.
+
+    - name: START_END_SAME
+      type: number
+      desc: Represents a result where the start and end points are the same.
+
+    - name: DIRECTION_FOUR
+      type: number
+      desc: Represents the four-direction movement option.
+
+    - name: DIRECTION_EIGHT
+      type: number
+      desc: Represents the eight-direction movement option.
