@@ -18,6 +18,15 @@ int Map::WorldAt(int x, int y)
     }
 }
 
+void Map::SetToWorldAt(int x, int y, int value)
+{
+    if (x >= 0 && x < worldWidth && y >= 0 && y < worldHeight)
+    {
+        ResetPath();
+        world[y * worldWidth + x] = value;
+    }
+}
+
 void Map::ResetPath()
 {
     if (pather != NULL)

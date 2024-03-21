@@ -73,6 +73,7 @@ public:
     void ResetPath();
     void ClearPath();
     int WorldAt(int x, int y);
+    void SetToWorldAt(int x, int y, int value);
     void NodeToXY( void* node, int* x, int* y );
     void* XYToNode( size_t x, size_t y );
     

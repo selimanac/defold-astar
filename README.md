@@ -221,6 +221,60 @@ end
 If your state space is huge, occasionally call astar.reset_cache() to free unused memory.
 
 
+
+## astar.get_at(`x`, `y`)
+
+Returns the value from the map array by coordinates.
+
+**PARAMETERS**
+
+X, Y of the tile possition on array not the screen position.
+
+* ```x``` (int) - Tile X
+* ```y``` (int) - Tile Y
+
+
+**RETURN**
+
+* ```value``` (int)
+
+
+**EXAMPLE**
+
+```lua
+
+local value = astar.get_at(1, 1)
+
+if value > 0 then
+	print("boo")
+end
+
+```
+
+
+## astar.set_at(`x`, `y`, `value`)
+
+Set your value to the map array by coordinates.
+*Setting new data reset the current cache.
+
+**PARAMETERS**
+
+X, Y of the tile possition on array not the screen position.
+
+* ```x``` (int) - Tile X
+* ```y``` (int) - Tile Y
+* ```value``` (int) 
+
+
+**EXAMPLE**
+
+```lua
+
+astar.set_at(1, 1, 0)
+
+
+```
+
 ---
 
 ## Games using A-Star
