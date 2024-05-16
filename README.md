@@ -275,6 +275,30 @@ astar.set_at(1, 1, 0)
 
 ```
 
+
+## astar.toogle_zero(`type`)
+
+Toggle start index 0 or 1 for tables and tile positions.
+
+
+If set to `true`, [astar.solve](#astarsolvestart_x-start_y-end_x-end_y), [astar.solve_near](#astarsolve_nearstart_x-start_y-max_cost), [astar.get_at](#astarget_atx-y), [astar.set_at](#astarset_atx-y-value) methods expect positions start with 1 and returns table indexes from **1**.   
+
+
+Default is `false` for backward compatibility.
+
+**PARAMETERS**
+
+* ```type``` (bool) - true/false
+
+**EXAMPLE**
+
+```lua
+
+astar.toogle_zero(true)
+
+
+```
+
 ---
 
 ## Games using A-Star

@@ -10,3 +10,4 @@ Thumbs.db
 builtins
 /.vscode
 .vscode
+*.json
