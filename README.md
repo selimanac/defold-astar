@@ -23,6 +23,11 @@ https://forum.defold.com/t/a-native-extension/
 
 ## Release Notes
 
+1.0.2  
+
+- astar.set_at and astar.get_at added.
+- astar.toogle_zero added. 
+
 1.0.1  
 
 Small bug fixes. [More details](https://forum.defold.com/t/a-native-extension/60405/9?u=selimanac) 
