@@ -311,8 +311,19 @@ astar.toogle_zero(true)
 
 ### Monkey Mart
 
-![DAABBCC](/.github/monkey_mart.jpg?raw=true)
+![Monkey Mart](/.github/monkey_mart.jpg?raw=true)
 
 **Developer:** [Tiny Dobbins](http://tinydobbins.com/)  
 **Release Date:** 8 Dec, 2022  
-**Poki:** https://poki.com/en/g/monkey-mart
+**Poki:** https://poki.com/en/g/monkey-mart  
+**Google Play:** https://play.google.com/store/apps/details?id=com.tinydobbins.monkeymart   
+**App Store:** https://apps.apple.com/tr/app/monkey-mart/id6480208265  
+
+### Xfire
+
+![Xfire](/.github/xfire.png?raw=true)
+
+**Developer:** [171Dev](https://www.171dev.uk)  
+**Release Date:** 28 May, 2024  
+**itch.io:** https://benjames171.itch.io/xfire  
+**Source:** https://github.com/benjames-171/xfire 
