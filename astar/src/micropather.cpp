@@ -118,7 +118,9 @@ private:
   Graph *graph;
 };
 
-PathNodePool::PathNodePool(unsigned _allocate, unsigned _typicalAdjacent) : firstBlock(0), blocks(0), allocate(_allocate), nAllocated(0), nAvailable(0) {
+PathNodePool::PathNodePool(unsigned _allocate, unsigned _typicalAdjacent)
+    : firstBlock(0), blocks(0), allocate(_allocate), nAllocated(0),
+      nAvailable(0) {
   freeMemSentinel.InitSentinel();
 
   cacheCap = allocate * _typicalAdjacent;
@@ -156,7 +158,9 @@ bool PathNodePool::PushCache(const NodeCost *nodes, int nNodes, int *start) {
   return false;
 }
 
-void PathNodePool::GetCache(int start, int nNodes, NodeCost *nodes) { memcpy(nodes, &cache[start], sizeof(NodeCost) * nNodes); }
+void PathNodePool::GetCache(int start, int nNodes, NodeCost *nodes) {
+  memcpy(nodes, &cache[start], sizeof(NodeCost) * nNodes);
+}
 
 void PathNodePool::Clear() {
 #ifdef TRACK_COLLISION
@@ -199,7 +203,8 @@ void PathNodePool::Clear() {
 }
 
 PathNodePool::Block *PathNodePool::NewBlock() {
-  Block *block = (Block *)calloc(1, sizeof(Block) + sizeof(PathNode) * (allocate - 1));
+  Block *block =
+      (Block *)calloc(1, sizeof(Block) + sizeof(PathNode) * (allocate - 1));
   block->nextBlock = 0;
 
   nAvailable += allocate;
@@ -266,12 +271,10 @@ unsigned PathNodePool::Hash(void *voidval) {
 
 PathNode *PathNodePool::Alloc() {
   if (freeMemSentinel.next == &freeMemSentinel) {
-  
 
     Block *b = NewBlock();
     b->nextBlock = blocks;
     blocks = b;
-  
   }
   PathNode *pathNode = freeMemSentinel.next;
   pathNode->Unlink();
@@ -313,7 +316,9 @@ PathNode *PathNodePool::FetchPathNode(void *state) {
   return root;
 }
 
-PathNode *PathNodePool::GetPathNode(unsigned frame, void *_state, float _costFromStart, float _estToGoal, PathNode *_parent) {
+PathNode *PathNodePool::GetPathNode(unsigned frame, void *_state,
+                                    float _costFromStart, float _estToGoal,
+                                    PathNode *_parent) {
   unsigned key = Hash(_state);
 
   PathNode *root = hashTable[key];
@@ -337,7 +342,8 @@ PathNode *PathNodePool::GetPathNode(unsigned frame, void *_state, float _costFro
   return root;
 }
 
-void PathNode::Init(unsigned _frame, void *_state, float _costFromStart, float _estToGoal, PathNode *_parent) {
+void PathNode::Init(unsigned _frame, void *_state, float _costFromStart,
+                    float _estToGoal, PathNode *_parent) {
   state = _state;
   costFromStart = _costFromStart;
   estToGoal = _estToGoal;
@@ -354,7 +360,9 @@ void PathNode::Clear() {
   cacheIndex = -1;
 }
 
-MicroPather::MicroPather(Graph *_graph, unsigned allocate, unsigned typicalAdjacent, bool cache) : pathNodePool(allocate, typicalAdjacent), graph(_graph), frame(0) {
+MicroPather::MicroPather(Graph *_graph, unsigned allocate,
+                         unsigned typicalAdjacent, bool cache)
+    : pathNodePool(allocate, typicalAdjacent), graph(_graph), frame(0) {
 
   pathCache = 0;
   if (cache) {
@@ -373,7 +381,8 @@ void MicroPather::Reset() {
   frame = 0;
 }
 
-void MicroPather::GoalReached(PathNode *node, void *start, void *end, MP_VECTOR<void *> *_path) {
+void MicroPather::GoalReached(PathNode *node, void *start, void *end,
+                              MP_VECTOR<void *> *_path) {
   MP_VECTOR<void *> &path = *_path;
   path.clear();
 
@@ -430,7 +439,8 @@ void MicroPather::GoalReached(PathNode *node, void *start, void *end, MP_VECTOR<
   }
 }
 
-void MicroPather::GetNodeNeighbors(PathNode *node, MP_VECTOR<NodeCost> *pNodeCost) {
+void MicroPather::GetNodeNeighbors(PathNode *node,
+                                   MP_VECTOR<NodeCost> *pNodeCost) {
   if (node->numAdjacent == 0) {
     // it has no neighbors.
     pNodeCost->resize(0);
@@ -454,12 +464,14 @@ void MicroPather::GetNodeNeighbors(PathNode *node, MP_VECTOR<NodeCost> *pNodeCos
       for (unsigned i = 0; i < stateCostVecSize; ++i) {
         void *state = stateCostVecPtr[i].state;
         pNodeCostPtr[i].cost = stateCostVecPtr[i].cost;
-        pNodeCostPtr[i].node = pathNodePool.GetPathNode(frame, state, FLT_MAX, FLT_MAX, 0);
+        pNodeCostPtr[i].node =
+            pathNodePool.GetPathNode(frame, state, FLT_MAX, FLT_MAX, 0);
       }
 
       // Can this be cached?
       int start = 0;
-      if (pNodeCost->size() > 0 && pathNodePool.PushCache(pNodeCostPtr, pNodeCost->size(), &start)) {
+      if (pNodeCost->size() > 0 &&
+          pathNodePool.PushCache(pNodeCostPtr, pNodeCost->size(), &start)) {
         node->cacheIndex = start;
       }
     }
@@ -514,7 +526,8 @@ void PathCache::Reset() {
   }
 }
 
-void PathCache::Add(const MP_VECTOR<void *> &path, const MP_VECTOR<float> &cost) {
+void PathCache::Add(const MP_VECTOR<void *> &path,
+                    const MP_VECTOR<float> &cost) {
   if (nItems + (int)path.size() > allocated * 3 / 4) {
     return;
   }
@@ -543,7 +556,8 @@ void PathCache::AddNoSolution(void *end, void *states[], int count) {
   }
 }
 
-int PathCache::Solve(void *start, void *end, MP_VECTOR<void *> *path, float *totalCost) {
+int PathCache::Solve(void *start, void *end, MP_VECTOR<void *> *path,
+                     float *totalCost) {
   const Item *item = Find(start, end);
   if (item) {
     if (item->cost == FLT_MAX) {
@@ -610,19 +624,22 @@ void MicroPather::GetCacheData(CacheData *data) {
   if (pathCache) {
     data->nBytesAllocated = pathCache->AllocatedBytes();
     data->nBytesUsed = pathCache->UsedBytes();
-    data->memoryFraction = (float)((double)data->nBytesUsed / (double)data->nBytesAllocated);
+    data->memoryFraction =
+        (float)((double)data->nBytesUsed / (double)data->nBytesAllocated);
 
     data->hit = pathCache->hit;
     data->miss = pathCache->miss;
     if (data->hit + data->miss) {
-      data->hitFraction = (float)((double)(data->hit) / (double)(data->hit + data->miss));
+      data->hitFraction =
+          (float)((double)(data->hit) / (double)(data->hit + data->miss));
     } else {
       data->hitFraction = 0;
     }
   }
 }
 
-int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path, float *cost) {
+int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path,
+                       float *cost) {
   // Important to clear() in case the caller doesn't check the return code.
   // There can easily be a left over path  from a previous call.
   path->clear();
@@ -645,7 +662,8 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path, 
   OpenQueue open(graph);
   ClosedSet closed(graph);
 
-  PathNode *newPathNode = pathNodePool.GetPathNode(frame, startNode, 0, graph->LeastCostEstimate(startNode, endNode), 0);
+  PathNode *newPathNode = pathNodePool.GetPathNode(
+      frame, startNode, 0, graph->LeastCostEstimate(startNode, endNode), 0);
 
   open.Push(newPathNode);
   stateCostVec.resize(0);
@@ -675,7 +693,8 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path, 
 
         PathNode *inOpen = child->inOpen ? child : 0;
         PathNode *inClosed = child->inClosed ? child : 0;
-        PathNode *inEither = (PathNode *)(((MP_UPTR)inOpen) | ((MP_UPTR)inClosed));
+        PathNode *inEither =
+            (PathNode *)(((MP_UPTR)inOpen) | ((MP_UPTR)inClosed));
 
         if (inEither) {
           if (newCost < child->costFromStart) {
@@ -706,7 +725,8 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path, 
   return NO_SOLUTION;
 }
 
-int MicroPather::SolveForNearStates(void *startState, MP_VECTOR<StateCost> *near, float maxCost) {
+int MicroPather::SolveForNearStates(void *startState,
+                                    MP_VECTOR<StateCost> *near, float maxCost) {
   /*	 http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
            1  function Dijkstra(Graph, source):
@@ -756,7 +776,8 @@ int MicroPather::SolveForNearStates(void *startState, MP_VECTOR<StateCost> *near
       float newCost = node->costFromStart + nodeCostVec[i].cost;
 
       PathNode *inOpen = nodeCostVec[i].node->inOpen ? nodeCostVec[i].node : 0;
-      PathNode *inClosed = nodeCostVec[i].node->inClosed ? nodeCostVec[i].node : 0;
+      PathNode *inClosed =
+          nodeCostVec[i].node->inClosed ? nodeCostVec[i].node : 0;
 
       PathNode *inEither = inOpen ? inOpen : inClosed;
 
@@ -780,7 +801,8 @@ int MicroPather::SolveForNearStates(void *startState, MP_VECTOR<StateCost> *near
   }
   near->clear();
 
-  for (PathNode *pNode = closedSentinel.next; pNode != &closedSentinel; pNode = pNode->next) {
+  for (PathNode *pNode = closedSentinel.next; pNode != &closedSentinel;
+       pNode = pNode->next) {
     if (pNode->totalCost <= maxCost) {
       StateCost sc;
       sc.cost = pNode->totalCost;

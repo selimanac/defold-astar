@@ -1,4 +1,6 @@
 #include "Map.hpp"
+#include "dmsdk/dlib/log.h"
+#include <sys/_types/_size_t.h>
 
 Map::~Map() {
   delete[] world;
@@ -36,10 +38,20 @@ void Map::NodeToXY(void *node, int *x, int *y) {
 
 void *Map::XYToNode(size_t x, size_t y) { return (void *)(y * worldWidth + x); }
 
-int Map::Passable(int nx, int ny) {
+int Map::Passable(int nx, int ny, void *node) {
   if (nx >= 0 && nx < worldWidth && ny >= 0 && ny < worldHeight) {
     int index = ny * worldWidth + nx;
     int c = world[index];
+
+    if (getEntity) {
+      for (int i = 0; i < entitiesSize; i++) {
+        if (c == entities[i]) {
+
+          return c;
+        }
+      }
+    }
+
     for (unsigned int a = 0; a < tileCount; a = a + 1) {
       if (Costs[a].tile_id == c) {
         return c;
@@ -71,6 +83,7 @@ float Map::LeastCostEstimate(void *nodeStart, void *nodeEnd) {
 }
 
 void Map::AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
+
   int x, y, nx, ny, pass;
   NodeToXY(node, &x, &y);
   StateCost nodeCost;
@@ -79,13 +92,31 @@ void Map::AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
     for (unsigned int b = 0; b < worldDirection; b = b + 1) {
       nx = x + dx[b];
       ny = y + dy[b];
-      pass = Passable(nx, ny);
+      pass = Passable(nx, ny, node);
+
+      // TODO ONLY IF SET
+      if (getEntity) {
+        for (int i = 0; i < entitiesSize; i++) {
+          if (pass == entities[i]) {
+            if (WorldAt(nx, ny) >= 0) {
+
+              if (XYToNode(nx, ny) == XYToNode(pathTo.x, pathTo.y)) {
+
+                nodeCost.state = XYToNode(nx, ny);
+                nodeCost.cost = Costs[a].costs[b];
+                neighbors->push_back(nodeCost);
+              }
+            }
+          }
+        }
+      }
 
       if (pass == Costs[a].tile_id) {
         if (WorldAt(nx, ny) >= 0) {
           //   nodeCost = { XYToNode( nx, ny ), Costs[a].costs[b] };
           nodeCost.state = XYToNode(nx, ny);
           nodeCost.cost = Costs[a].costs[b];
+
           neighbors->push_back(nodeCost);
         }
       }
@@ -107,7 +138,7 @@ void Map::Setup(int _worldWidth, int _worldHeight, int _worldDirection = 8,
 
   world = (int *)malloc(sizeof(int) * worldWidth * worldHeight);
   memset(world, 0,
-         sizeof(int) * worldWidth * worldHeight); // Set all to 0 -> Walkable
+         sizeof(int) * worldWidth * worldHeight); // Set all to 0  -> Walkable
 
   pather = new MicroPather(this, _allocate, _typicalAdjacent, _cache);
 }
@@ -115,6 +146,15 @@ void Map::Setup(int _worldWidth, int _worldHeight, int _worldDirection = 8,
 void Map::SetMap(int *_world) {
   ResetPath();
   memcpy(world, _world, sizeof(int) * worldWidth * worldHeight);
+}
+
+void Map::SetEntities(int *_entities, size_t size) {
+  ResetPath();
+
+  entitiesSize = size;
+
+  entities = (int *)malloc(sizeof(int) * size);
+  memcpy(entities, _entities, sizeof(int) * size);
 }
 
 void Map::Clear() {
@@ -138,8 +178,8 @@ void Map::Clear() {
 
 int Map::Solve() {
   if (Costs == NULL) {
-    dmLogError(
-        "COSTS is null: Please set costs by using astar.set_costs(costs)\n");
+    dmLogError("COSTS is null: Please set costs by using "
+               "astar.set_costs(costs)\n");
     return NO_SOLUTION;
   }
 
@@ -158,8 +198,8 @@ int Map::Solve() {
 
 int Map::SolveNear(float maxCost) {
   if (Costs == NULL) {
-    dmLogError(
-        "COSTS is null: Please set costs by using astar.set_costs(costs)\n");
+    dmLogError("COSTS is null: Please set costs by using "
+               "astar.set_costs(costs)\n");
     return NO_SOLUTION;
   }
 

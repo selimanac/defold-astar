@@ -5,6 +5,7 @@
 #include <math.h>
 #include <micropather.h>
 #include <stdio.h>
+#include <sys/_types/_size_t.h>
 using namespace micropather;
 
 typedef struct {
@@ -39,11 +40,14 @@ private:
 public:
   int worldWidth, worldHeight, tileCount, worldDirection;
   int *world;
+  int *entities;
+  bool getEntity = false;
   Position pathFrom = {0, 0};
   Position pathTo = {5, 5};
   MPVector<void *> path;
   MPVector<StateCost> nears;
   Tile *Costs;
+  size_t entitiesSize;
 
   Map(){};
   ~Map();
@@ -59,6 +63,7 @@ public:
   void Setup(int _worldWidth, int _worldHeight, int _worldDirection,
              int _allocate, int _typicalAdjacent, bool _cache);
   void SetMap(int *_world);
+  void SetEntities(int *_entities, size_t size);
   void ResetPath();
   void ClearPath();
   int WorldAt(int x, int y);
@@ -67,7 +72,7 @@ public:
   void *XYToNode(size_t x, size_t y);
 
   virtual float LeastCostEstimate(void *nodeStart, void *nodeEnd);
-  int Passable(int nx, int ny);
+  int Passable(int nx, int ny, void *node);
   virtual void AdjacentCost(void *node, MPVector<StateCost> *neighbors);
   virtual void PrintStateInfo(void *node){};
   float totalCost;

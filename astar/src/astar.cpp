@@ -12,6 +12,7 @@ int x, y;
 float maxCost;
 unsigned size, pathResult;
 unsigned short int zero = 0;
+bool flipMap = false;
 
 static int astar_setup(lua_State *L) {
   int _worldWidth = luaL_checkint(L, 1);
@@ -19,19 +20,46 @@ static int astar_setup(lua_State *L) {
   int _worldDirection = luaL_checkint(L, 3);
   int _allocate = luaL_checkint(L, 4);
   int _typicalAdjacent = luaL_checkint(L, 5);
-  bool _cache = lua_toboolean(L, 6);
+  bool _cache = true;
+
+  if (lua_isboolean(L, 6)) {
+    _cache = lua_toboolean(L, 6);
+  }
+
+  if (lua_isboolean(L, 7)) {
+    flipMap = lua_toboolean(L, 7);
+  }
 
   map.Setup(_worldWidth, _worldHeight, _worldDirection, _allocate,
             _typicalAdjacent, _cache);
-
   return 0;
 }
 
 static int astar_toogle_zero(lua_State *L) {
   bool _zero = lua_toboolean(L, 1);
-
   (_zero) ? zero = 1 : zero = 0;
+  return 0;
+}
 
+static int astar_set_entities(lua_State *L) {
+  luaL_checktype(L, 1, LUA_TTABLE);
+
+  size_t size = lua_objlen(L, 1);
+  if (size == 0) {
+    dmLogError("Entities table can not be empty");
+  }
+
+  int _entities[size];
+
+  for (int i = 0; i < size; i++) {
+    lua_pushinteger(L, i + 1);
+    lua_gettable(L, -2);
+    if (lua_isnumber(L, -1)) {
+      _entities[i] = lua_tointeger(L, -1);
+    }
+    lua_pop(L, 1);
+  }
+  map.SetEntities(_entities, size);
   return 0;
 }
 
@@ -40,6 +68,7 @@ static int astar_setmap(lua_State *L) {
 
   size = map.worldWidth * map.worldHeight;
   int _world[size];
+
   for (int i = 0; i < size; i++) {
     lua_pushinteger(L, i + 1);
     lua_gettable(L, -2);
@@ -48,6 +77,25 @@ static int astar_setmap(lua_State *L) {
     }
     lua_pop(L, 1);
   }
+
+  // FLIP TO MAP FOR DEFOLD COORD STYLE
+  if (flipMap) {
+    for (int y = 0; y < map.worldHeight / 2; ++y) {
+      for (int x = 0; x < map.worldWidth; ++x) {
+        int temp = _world[y * map.worldWidth + x];
+        _world[y * map.worldWidth + x] =
+            _world[(map.worldHeight - y - 1) * map.worldWidth + x];
+        _world[(map.worldHeight - y - 1) * map.worldWidth + x] = temp;
+      }
+    }
+  }
+
+  /*
+  //DEBUG MAP
+  for (int i = 0; i < size; i++) {
+    printf("%d - %d\n", i, _world[i]);
+  }*/
+
   map.SetMap(_world);
 
   return 0;
@@ -135,10 +183,15 @@ static int astar_set_at(lua_State *L) {
 
 static int astar_solve(lua_State *L) {
   int i = 3;
+
   map.pathFrom.x = luaL_checkint(L, 1) - zero;
   map.pathFrom.y = luaL_checkint(L, 2) - zero;
   map.pathTo.x = luaL_checkint(L, 3) - zero;
   map.pathTo.y = luaL_checkint(L, 4) - zero;
+
+  if (lua_isboolean(L, 5)) {
+    map.getEntity = lua_toboolean(L, 5);
+  }
 
   pathResult = map.Solve();
 
@@ -172,6 +225,8 @@ static int astar_solve(lua_State *L) {
       lua_rawseti(L, newTable, ii + 1);
     }
   }
+
+  map.getEntity = false;
 
   return i;
 }
@@ -230,6 +285,7 @@ static const luaL_reg Module_methods[] = {{"solve_near", astar_solvenear},
                                           {"get_at", astar_get_at},
                                           {"set_at", astar_set_at},
                                           {"toogle_zero", astar_toogle_zero},
+                                          {"set_entities", astar_set_entities},
                                           {0, 0}
 
 };
@@ -266,19 +322,11 @@ dmExtension::Result AppInitializeAstar(dmExtension::AppParams *params) {
 }
 
 dmExtension::Result InitializeAstar(dmExtension::Params *params) {
-  // Init Lua
+
   LuaInit(params->m_L);
   printf("Registered %s Extension\n", MODULE_NAME);
   return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result AppFinalizeAstar(dmExtension::AppParams *params) {
-  return dmExtension::RESULT_OK;
-}
-
-dmExtension::Result FinalizeAstar(dmExtension::Params *params) {
-  return dmExtension::RESULT_OK;
-}
-
-DM_DECLARE_EXTENSION(astar, LIB_NAME, AppInitializeAstar, AppFinalizeAstar,
-                     InitializeAstar, 0, 0, FinalizeAstar)
+DM_DECLARE_EXTENSION(astar, LIB_NAME, AppInitializeAstar, 0, InitializeAstar, 0,
+                     0, 0)

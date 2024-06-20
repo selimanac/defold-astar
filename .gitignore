@@ -11,3 +11,7 @@ builtins
 /.vscode
 .vscode
 *.json
+*.clang-format
+compiler_commands.json
+*.sublime-project
+*.sublime-workspace
