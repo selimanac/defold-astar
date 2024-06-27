@@ -3,7 +3,7 @@
   desc: A* Path Finding
   members:
     - name: setup
-      desc: Initial setup.
+      desc: Initial setup. You have to setup the astar before calling any other methods.
       type: function
       parameters:
         - name: map_width
@@ -14,8 +14,7 @@
           desc: Height of your map. This is generally width of your tilemap.
         - name: direction
           type: number
-          desc:
-            Movement direction (`astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`).
+          desc: Movement direction (astar.DIRECTION_FOUR or astar.DIRECTION_EIGHT)
 
             `astar.DIRECTION_FOUR` - on a square grid that allows 4 directions of movement using Manhattan distance.
 
@@ -33,9 +32,42 @@
         - name: typical_adjacent
           type: number
           desc: Used to determine cache size. The typical number of adjacent states to a given state. (On a chessboard, 8.) Higher values use a little more memory.
-        - name: cache
+        - name: cache[optional]
           type: boolean
-          desc: Turn on path caching. Uses more memory (yet again) but at a huge speed advantage if you may call the pather with the same path or sub-path, which is common for pathing over maps in games.
+          desc: Turn on path caching. Uses more memory (yet again) but at a huge speed advantage if you may call the pather with the same path or sub-path, which is common for pathing over maps in games.  Default is `true`
+        - name: use_zero[optional]
+          type: boolean
+          desc: Toggle start index 0 or 1 for tables and tile positions. Also you can set it by call `astar.use_zero()`.  Default is `false`
+
+        - name: map_vflip[optional]
+          type: boolean
+          desc: Flips the map vertically. This doesn't flip the coordinates. Also you can set it by call `astar.map_vflip()`. Default is `false`
+      examples:
+        - desc: |-
+            ```lua
+
+            local map_width = 5
+            local map_height = 4
+            local direction = astar.DIRECTION_EIGHT
+            local allocate = map_width * map_height
+            local typical_adjacent = 8
+            local cache = true     -- Optional. Default is true
+            local flip_map = false -- Optional. Default is false
+
+            astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, flip_map)
+
+            ```
+    - name: use_zero
+      desc: Toggle start index 0 or 1 for tables and tile positions.
+
+        If set to `false`, [astar.solve](#astarsolvestart_x-start_y-end_x-end_y), [astar.solve_near](#astarsolve_nearstart_x-start_y-max_cost), [astar.get_at](#astarget_atx-y), [astar.set_at](#astarset_atx-y-value) methods expect positions start with 1 and returns table indexes from **1**.
+
+        Default is `false` = 1
+
+      parameters:
+        - name: toggle
+          type: boolean
+          desc: true/false
 
     - name: set_map
       desc: Set your map data.

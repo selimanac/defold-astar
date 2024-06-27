@@ -1,174 +1,72 @@
-local data = require('main.data')
-
-local world = data.world
-
--- Cost per direction
-local costs = {
-    [130] = {
-        1.0,  -- E
-        1.0,  -- N
-        1.0,  -- W
-        1.0,  -- S
-        1.41, -- NE
-        1.41, -- NW
-        1.41, -- SW
-        1.41  -- SE
-    }
-}
--- SETUP
-local map_width = 39
-local map_height = 20
+local map_width = 5
+local map_height = 4
 local direction = astar.DIRECTION_EIGHT
-
---[[
-        allocate: How many states should be internally allocated at a time. This
-        can be hard to get correct. The higher the value, the more memory
-        Patfinder will use.
-
-        - If you have a small map (a few thousand states?) it may make sense
-        to pass in the maximum value. This will cache everything, and MicroPather
-        will only need one main memory allocation. For a chess board, allocate
-        would be set to 8x8 (64)
-
-         - If your map is large, something like 1/4 the number of possible
-         states is good.
-
-         - If your state space is huge, use a multiple (5-10x) of the normal
-         path. "Occasionally" call astar.reset_cache() to free unused memory.
-]]
 local allocate = map_width * map_height
+local typical_adjacent = map_width * map_height
+local cache = true      -- Optional. Default is true
+local use_zero = false  -- Optional. Default is false = 1 based
+local map_vflip = false -- Optional. Default is false
+local world = {
+	2, 0, 0, 0, 0,
+	0, 0, 0, 0, 0,
+	0, 0, 1, 3, 0,
+	1, 0, 0, 0, 2,
+}
+local costs = {
+	[0] = {
+		1.0, -- E
+		1.0, -- N
+		1.0, -- W
+		1.0, -- S
+		1.41, -- NE
+		1.41, -- NW
+		1.41, -- SW
+		1.41 -- SE
+	}
+}
 
---[[
-        typicalAdjacent: Used to determine cache size. The typical number of adjacent states
-        to a given state. (On a chessboard, 8.) Higher values use a little
-        more memory.
-]]
-local typical_adjacent = 8
-
---[[
-        cache: Turn on path caching. Uses more memory (yet again) but at a huge speed
-        advantage if you may call the pather with the same path or sub-path, which
-        is common for pathing over maps in games.
-]]
-local cache = true
-
--- Solve
-local start_x = 1
-local start_y = 18
-local end_x = 17
-local end_y = 2
-local max_cost = 3.0 -- near
-
-local function test_selected()
-    local sworld = {
-        -- 1.1 , 2.1 , 3-1
-        -- 0.0 , 1.0 , 2.0
-        0, 0, 0,
-        -- 1.2 , 2.2 , 3-2
-        -- 0.1 , 1.1 , 2.1
-        0, 0, 0,
-        -- 1.3 , 2.3 , 3.3
-        -- 0.2 , 1.2 , 2.2
-        0, 0, 0
-
-    }
-
-
-    local rworld = {
-        -- 1.3 , 2.3 , 3.3
-        -- 0.2 , 1.2 , 2.2
-        0, 2, 1,
-        -- 1.2 , 2.2 , 3-2
-        -- 0.1 , 1.1 , 2.1
-        2, 1, 0,
-
-        -- 1.1 , 2.1 , 3-1
-        -- 0.0 , 1.0 , 2.0
-        0, 0, 0
-
-    }
-
-    local scosts = {
-        [0] = {
-            1.0,  -- E
-            1.0,  -- N
-            1.0,  -- W
-            1.0,  -- S
-            1.41, -- NE
-            1.41, -- NW
-            1.41, -- SW
-            1.41  -- SE
-        }
-    }
-
-    local entities = {
-        1, 2
-    }
-
-
-    astar.setup(3, 3, direction, 36, 36, true, true)
-
-    astar.set_map(rworld)
-    astar.set_entities(entities)
-    astar.set_costs(scosts)
-    astar.toogle_zero(true)
-    local result, size, total_cost, path = astar.solve(3, 1, 1, 3, true)
-
-    if result == astar.SOLVED then
-        print("SOLVED")
-        for i, v in ipairs(path) do
-            print("Tile: ", v.x .. "-" .. v.y)
-        end
-    elseif result == astar.NO_SOLUTION then
-        print("NO_SOLUTION")
-    elseif result == astar.START_END_SAME then
-        print("START_END_SAME")
-    end
-end
+local entities = {
+	1
+}
 
 function init(self)
-    test_selected()
+	astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, use_zero, map_vflip)
+	astar.set_map(world)
+	astar.set_costs(costs)
+	astar.set_entities(entities)
+	astar.use_entities(true)
+	astar.print_map()
 
-    --[[
+	local status, size, total_cost, path = astar.solve(5, 1, 1, 4)
 
-    astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache)
-    astar.set_map(world)
-    astar.set_costs(costs)
+	if status == astar.SOLVED then
+		print("PATH SOLVED")
+		print("Path Size", size)
+		print("Total Cost:", total_cost)
 
-    --  astar.toogle_zero(true);
+		for _, tile in ipairs(path) do
+			print("tile x:", tile.x, "tile y: ", tile.y, "tile ID: ", tile.id)
+		end
+	elseif status == astar.NO_SOLUTION then
+		print("NO_SOLUTION")
+	elseif status == astar.START_END_SAME then
+		print("START_END_SAME")
+	end
 
-    local result, size, total_cost, path = astar.solve(start_x, start_y, end_x, end_y)
+	astar.use_entities(false)
 
-    print("size:", size)
-    print("total_cost:", total_cost)
+	local near_status, near_size, nears = astar.solve_near(3, 4, 1.0)
 
-    if result == astar.SOLVED then
-        print("SOLVED")
-        for i, v in ipairs(path) do
-            print("Tile: ", v.x .. "-" .. v.y)
-        end
-    elseif result == astar.NO_SOLUTION then
-        print("NO_SOLUTION")
-    elseif result == astar.START_END_SAME then
-        print("START_END_SAME")
-    end
+	if near_status == astar.SOLVED then
+		print("NEAR SOLVED")
+		print("Near Size:", near_size)
 
-
-
-    local near_result, near_size, nears = astar.solve_near(start_x, start_y, max_cost)
-
-    print("near_size:", near_size)
-
-    if near_result == astar.SOLVED then
-        print("SOLVED")
-        for i, v in ipairs(nears) do
-            print("Tile: ", v.x .. "-" .. v.y)
-        end
-    elseif near_result == astar.NO_SOLUTION then
-        print("NO_SOLUTION")
-    elseif near_result == astar.START_END_SAME then
-        print("START_END_SAME")
-    end
-
-    print("-------------------------")]]
+		for _, tile in ipairs(nears) do
+			print("tile x:", tile.x, "tile y: ", tile.y, "tile ID: ", tile.id)
+		end
+	elseif near_status == astar.NO_SOLUTION then
+		print("NO_SOLUTION")
+	elseif near_status == astar.START_END_SAME then
+		print("START_END_SAME")
+	end
 end
