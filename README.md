@@ -1,6 +1,6 @@
 ![A*](/.github/defoldheader.png?raw=true)
 
-This is a pathfinder and A* solver (astar or a-star) native extension for the [Defold Engine](https://www.defold.com/), built on [MicroPather](https://github.com/leethomason/MicroPather).  
+This is a pathfinder and A* solver (astar or a-star) native extension for the [Defold Engine](https://www.defold.com/), built using [MicroPather](https://github.com/leethomason/MicroPather).  
 
 ## Installation
 
@@ -23,7 +23,7 @@ Old examples: https://github.com/selimanac/defold-astar-examples
 https://forum.defold.com/t/a-native-extension/
 
 ## Toss a Coin to Your Witcher
-If you find my [Defold Extensions](https://github.com/selimanac) useful for your projects, please consider [supporting](https://github.com/sponsors/selimanac) it. 
+If you find my [Defold Extensions](https://github.com/selimanac) useful for your projects, please consider [supporting](https://github.com/sponsors/selimanac) it.  
 I'd love to hear about your projects! Please share your released projects that use my native extensions. It would be very motivating for me.
 
 
