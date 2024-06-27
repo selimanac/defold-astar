@@ -8,7 +8,7 @@ uint8_t result;
 uint16_t worldWidth, worldHeight, tileCount, worldSize;
 uint8_t worldDirection = 8;
 uint8_t typicalAdjacent = 6;
-uint8_t mapType;
+uint8_t mapType = GRID_CLASSIC;
 
 int *world;
 float totalCost;

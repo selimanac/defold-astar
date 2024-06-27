@@ -1,6 +1,6 @@
 [bootstrap]
 main_collection = /main/main.collectionc
-render = /orthographic/render/orthographic.renderc
+render = /builtins/render/default.renderc
 
 [script]
 shared_state = 1
@@ -10,7 +10,6 @@ input_method = HiddenInputField
 
 [project]
 title = defold-astar
-dependencies = 
 
 [library]
 include_dirs = astar
