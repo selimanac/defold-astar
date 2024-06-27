@@ -23,7 +23,8 @@ Old examples: https://github.com/selimanac/defold-astar-examples
 https://forum.defold.com/t/a-native-extension/
 
 ## Toss a Coin to Your Witcher
-If you find my [Defold Extensions](https://github.com/selimanac) useful for your projects, please consider [supporting](https://github.com/sponsors/selimanac).
+If you find my [Defold Extensions](https://github.com/selimanac) useful for your projects, please consider [supporting](https://github.com/sponsors/selimanac) it. 
+I'd love to hear about your projects! Please share your released projects that use my native extensions. It would be very motivating for me.
 
 
 ## Release Notes
@@ -91,7 +92,7 @@ Initial setup. You have to setup the astar before calling any other methods.
 * ```typical_adjacent``` (int) - Used to determine cache size. The typical number of adjacent states to a given state. (On a chessboard, 8.) Higher values use a little more memory.
 
 * ```cache``` (bool)[optional] - Turn on path caching. Uses more memory (yet again) but at a huge speed advantage if you may call the pather with the same path or sub-path, which is common for pathing over maps in games.  Default is `true`
-* 
+
 *  ```use_zero``` (bool)[optional] - Toggle start index 0 or 1 for tables and tile positions. Also you can set it by call `astar.use_zero()`.  Default is `false`
 
 * ```map_vflip``` (bool)[optional] - Flips the map vertically. This doesn't flip the coordinates. Also you can set it by call `astar.map_vflip()`. Default is `false`
@@ -106,9 +107,10 @@ local direction = astar.DIRECTION_EIGHT
 local allocate = map_width * map_height
 local typical_adjacent = 8
 local cache = true     -- Optional. Default is true
+local use_zero = false -- ptional. Default is false = 1 based
 local flip_map = false -- Optional. Default is false
 
-astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, flip_map)
+astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, use_zero, flip_map)
 
 ```
 
@@ -165,7 +167,7 @@ astar.set_map_type(astar.HEX_ODDR)
 ## astar.set_map(world)
 
 Set your map data.  
-0.0(or 1.1) is top-left.  
+0.0 or 1.1 is top-left.  
 
 *Setting new map data reset the current cache.  
 
