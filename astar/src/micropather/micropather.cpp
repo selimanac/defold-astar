@@ -273,6 +273,8 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path,
     // Could add a bunch more with a little tracking.
     pathCache->AddNoSolution(endNode, &startNode, 1);
   }
+
+  pathNodePool.Clear();
   return NO_SOLUTION;
 }
 

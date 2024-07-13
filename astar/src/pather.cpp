@@ -238,6 +238,13 @@ int Passable(int16_t nx, int16_t ny) {
   return -1;
 }
 
+void PushNeighbors(StateCost *nodeCost, MPVector<StateCost> *neighbors,
+                   int16_t *nx, int16_t *ny, unsigned int a, unsigned int b) {
+  nodeCost->state = XYToNode(*nx, *ny);
+  nodeCost->cost = Costs[a].costs[b];
+  neighbors->push_back(*nodeCost);
+}
+
 void AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
   int16_t x, y, nx, ny, pass;
   NodeToXY(node, &x, &y);
@@ -278,14 +285,21 @@ void AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
               if (XYToNode(nx, ny) == XYToNode(pathTo.x, pathTo.y) &&
                   getEntity && getNearEntities == false) {
 
-                nodeCost.state = XYToNode(nx, ny);
-                nodeCost.cost = Costs[a].costs[b];
-                neighbors->push_back(nodeCost);
+                PushNeighbors(&nodeCost, neighbors, &nx, &ny, a, b);
+                /*
+                                // TODO :add push_back to method
+                                nodeCost.state = XYToNode(nx, ny);
+                                nodeCost.cost = Costs[a].costs[b];
+                                neighbors->push_back(nodeCost);
+                                */
               } else if (getNearEntities) {
-
-                nodeCost.state = XYToNode(nx, ny);
-                nodeCost.cost = Costs[a].costs[b];
-                neighbors->push_back(nodeCost);
+                PushNeighbors(&nodeCost, neighbors, &nx, &ny, a, b);
+                /*
+                                // TODO :add push_back to method
+                                nodeCost.state = XYToNode(nx, ny);
+                                nodeCost.cost = Costs[a].costs[b];
+                                neighbors->push_back(nodeCost);
+                                */
               }
             }
           }
@@ -294,9 +308,13 @@ void AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
 
       if (pass == Costs[a].tile_id) {
         if (WorldAt(nx, ny) >= 0) {
-          nodeCost.state = XYToNode(nx, ny);
-          nodeCost.cost = Costs[a].costs[b];
-          neighbors->push_back(nodeCost);
+
+          PushNeighbors(&nodeCost, neighbors, &nx, &ny, a, b);
+          /*
+            // TODO :add push_back to method
+            nodeCost.state = XYToNode(nx, ny);
+            nodeCost.cost = Costs[a].costs[b];
+            neighbors->push_back(nodeCost);*/
         }
       }
     }

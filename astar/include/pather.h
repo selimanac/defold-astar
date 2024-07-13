@@ -89,6 +89,8 @@ int WorldAt(int16_t x, int16_t y);
 void SetToWorldAt(int16_t x, int16_t y, int value);
 void NodeToXY(void *node, int16_t *x, int16_t *y);
 void *XYToNode(size_t x, size_t y);
+void PushNeighbors(StateCost *nodeCost, MPVector<StateCost> *neighbors,
+                   int16_t *nx, int16_t *ny, unsigned int a, unsigned int b);
 
 float LeastCostEstimate(void *nodeStart, void *nodeEnd);       // extern
 void AdjacentCost(void *node, MPVector<StateCost> *neighbors); // extern

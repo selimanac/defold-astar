@@ -13,7 +13,7 @@ or you can add stable versions from [releases](https://github.com/selimanac/defo
 
 ## Examples
 
-New examples are on the way.
+Hexagon example: https://github.com/selimanac/defold-astar-hex-example  
 
 Old examples: https://github.com/selimanac/defold-astar-examples
 
@@ -28,6 +28,11 @@ I'd love to hear about your projects! Please share your released projects that u
 
 
 ## Release Notes
+
+### 1.1.1
+
+- Minor edge case fix on Micropather core. 
+- Minor code refactoring. 
 
 ### 1.1.0
 
