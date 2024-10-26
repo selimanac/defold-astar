@@ -554,6 +554,28 @@ astar.reset()
 
 ## Games using A-Star
 
+### Skull Horde
+
+![Skull Horde](/.github/skull_horde.png?raw=true)
+
+**Developer:** [8BitSkull](https://www.8bitskull.com/)  
+**Publisher:** [8BitSkull](https://www.8bitskull.com/)   
+**Release Date:** TBA
+**Steam:** https://store.steampowered.com/app/3199360/Skull_Horde/  
+
+
+
+### Misland
+
+![Misland](/.github/misland.png?raw=true)
+
+**Developer:** [Seal Unicron Games](https://sealunicorn.com)  
+**Release Date:** 11 Nov, 2023  
+**Poki:** https://poki.com/en/g/misland
+**Google Play:** https://play.google.com/store/apps/details?id=com.sealunicorngames.misland  
+
+
+
 
 ### Monkey Mart
 
