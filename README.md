@@ -560,7 +560,7 @@ astar.reset()
 
 **Developer:** [8BitSkull](https://www.8bitskull.com/)  
 **Publisher:** [8BitSkull](https://www.8bitskull.com/)   
-**Release Date:** TBA
+**Release Date:** TBA  
 **Steam:** https://store.steampowered.com/app/3199360/Skull_Horde/  
 
 
@@ -571,8 +571,8 @@ astar.reset()
 
 **Developer:** [Seal Unicron Games](https://sealunicorn.com)  
 **Release Date:** 11 Nov, 2023  
-**Poki:** https://poki.com/en/g/misland
-**Google Play:** https://play.google.com/store/apps/details?id=com.sealunicorngames.misland  
+**Poki:** https://poki.com/en/g/misland  
+**Google Play:** https://play.google.com/store/apps/details?id=com.sealunicorngames.misland    
 
 
 
