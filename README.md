@@ -13,7 +13,8 @@ or you can add stable versions from [releases](https://github.com/selimanac/defo
 
 ## Examples
 
-Hexagon example: https://github.com/selimanac/defold-astar-hex-example  
+Hexagon example: https://github.com/selimanac/defold-astar-hex-example    
+Basic tilemap example: https://github.com/selimanac/defold-astar-tilemap-example
 
 Old examples: https://github.com/selimanac/defold-astar-examples
 
@@ -112,7 +113,7 @@ local direction = astar.DIRECTION_EIGHT
 local allocate = map_width * map_height
 local typical_adjacent = 8
 local cache = true     -- Optional. Default is true
-local use_zero = false -- ptional. Default is false = 1 based
+local use_zero = false -- Optional. Default is false = 1 based
 local flip_map = false -- Optional. Default is false
 
 astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, use_zero, flip_map)

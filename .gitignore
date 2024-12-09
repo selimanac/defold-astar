@@ -15,3 +15,5 @@ builtins
 compiler_commands.json
 *.sublime-project
 *.sublime-workspace
+/.editor_settings
+build_config.json
