@@ -2,111 +2,134 @@
 #define MODULE_NAME "astar"
 #define DLIB_LOG_DOMAIN "ASTAR"
 
-#include "micropather/micropather.h"
-#include <dmsdk/dlib/log.h>
 #include <dmsdk/sdk.h>
 #include <inttypes.h>
 #include <pather.h>
+#include <string_view>
+#include <unordered_map>
 
-float pathTotalCost = 0.0f;
-bool mapVFlip = false;
-uint8_t zero = 1;
-uint8_t pathSolved = 0;
-uint16_t pathSize = 0;
-int16_t pathX, pathY;
+struct MapData {
+  micropather::Map map;
+  float pathTotalCost = 0.0f;
+  bool mapVFlip = false;
+  uint8_t zero = 1;
+  uint8_t pathSolved = 0;
+  uint16_t pathSize = 0;
+  int16_t pathX, pathY;
+};
 
-static void use_zero(bool _zero) { (_zero) ? zero = 0 : zero = 1; }
+std::unordered_map<std::string_view, MapData> maps;
+
+static void use_zero(std::string_view mapId, bool _zero) {
+  maps.at(mapId).zero = (_zero) ? 0 : 1;
+}
 
 static int astar_setup(lua_State *L) {
-  uint16_t _worldWidth = luaL_checkint(L, 1);
-  uint16_t _worldHeight = luaL_checkint(L, 2);
-  uint8_t _worldDirection = luaL_checkint(L, 3);
-  uint16_t _allocate = luaL_checkint(L, 4);
-  uint16_t _typicalAdjacent = luaL_checkint(L, 5);
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  uint16_t _worldWidth = luaL_checkint(L, 2);
+  uint16_t _worldHeight = luaL_checkint(L, 3);
+  uint8_t _worldDirection = luaL_checkint(L, 4);
+  uint16_t _allocate = luaL_checkint(L, 5);
+  uint16_t _typicalAdjacent = luaL_checkint(L, 6);
   bool _cache = true;
 
-  if (lua_isboolean(L, 6)) {
-    _cache = lua_toboolean(L, 6);
+  if (lua_isboolean(L, 7)) {
+    _cache = lua_toboolean(L, 7);
   }
 
-  if (lua_isboolean(L, 7)) {
-    use_zero(lua_toboolean(L, 7));
-  }
+  auto [it, _] = maps.try_emplace(_mapId);
+  auto &map_data = it->second;
 
   if (lua_isboolean(L, 8)) {
-    mapVFlip = lua_toboolean(L, 8);
+    use_zero(_mapId, lua_toboolean(L, 8));
   }
 
-  micropather::Setup(_worldWidth, _worldHeight, _worldDirection, _allocate,
+  if (lua_isboolean(L, 9)) {
+    map_data.mapVFlip = lua_toboolean(L, 9);
+  }
+
+  map_data.map.Setup(_worldWidth, _worldHeight, _worldDirection, _allocate,
                      _typicalAdjacent, _cache);
+
   return 0;
 }
 
 static int astar_map_vflip(lua_State *L) {
-  micropather::MapVFlip();
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.MapVFlip();
   return 0;
 }
 
 static int astar_map_hflip(lua_State *L) {
-  micropather::MapHFlip();
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.MapHFlip();
   return 0;
 }
 
 static int astar_set_map_type(lua_State *L) {
-  micropather::SetMapType(luaL_checkint(L, 1));
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.SetMapType(luaL_checkint(L, 2));
   return 0;
 }
 
 static int astar_set_map(lua_State *L) {
-  luaL_checktype(L, 1, LUA_TTABLE);
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+  luaL_checktype(L, 2, LUA_TTABLE);
 
-  for (int i = 0; i < micropather::GetWorldSize(); i++) {
+  for (int i = 0; i < mapData.map.GetWorldSize(); i++) {
     lua_pushinteger(L, i + 1);
     lua_gettable(L, -2);
     if (lua_isnumber(L, -1)) {
-      micropather::SetTile(i, lua_tointeger(L, -1));
+      mapData.map.SetTile(i, lua_tointeger(L, -1));
     }
     lua_pop(L, 1);
   }
 
-  if (mapVFlip) {
-    micropather::MapVFlip();
+  if (mapData.mapVFlip) {
+    mapData.map.MapVFlip();
   }
 
   return 0;
 }
 
 static int astar_print_map(lua_State *L) {
-  micropather::PrintMap(zero);
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &map_data = maps.at(_mapId);
+  maps.at(_mapId).map.PrintMap(map_data.zero);
   return 0;
 }
 
 static int astar_use_entities(lua_State *L) {
-  micropather::UseEntities(lua_toboolean(L, 1));
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.UseEntities(lua_toboolean(L, 2));
   return 0;
 }
 
 static int astar_use_zero(lua_State *L) {
-  bool _zero = lua_toboolean(L, 1);
-  use_zero(_zero);
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  bool _zero = lua_toboolean(L, 2);
+  use_zero(_mapId, _zero);
   return 0;
 }
 
 static int astar_set_entities(lua_State *L) {
-  luaL_checktype(L, 1, LUA_TTABLE);
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+  luaL_checktype(L, 2, LUA_TTABLE);
 
-  size_t size = lua_objlen(L, 1);
+  size_t size = lua_objlen(L, 2);
   if (size == 0) {
     dmLogError("Entities table can not be empty");
   }
 
-  micropather::SetEntityCount(size);
+  mapData.map.SetEntityCount(size);
 
   for (int i = 0; i < size; i++) {
     lua_pushinteger(L, i + 1);
     lua_gettable(L, -2);
     if (lua_isnumber(L, -1)) {
-      micropather::SetEntity(i, lua_tointeger(L, -1));
+      mapData.map.SetEntity(i, lua_tointeger(L, -1));
     }
     lua_pop(L, 1);
   }
@@ -115,41 +138,43 @@ static int astar_set_entities(lua_State *L) {
 }
 
 static int astar_set_costs(lua_State *L) {
-  luaL_checktype(L, 1, LUA_TTABLE);
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+  luaL_checktype(L, 2, LUA_TTABLE);
 
-  micropather::ResizePath();
-  micropather::ResetPath();
+  mapData.map.ResizePath();
+  mapData.map.ResetPath();
 
   uint16_t tileCount = 0;
   uint16_t id = 0;
   uint16_t costID = 0;
 
   lua_pushnil(L);
-  while (lua_next(L, 1) != 0) {
+  while (lua_next(L, 2) != 0) {
     tileCount++;
     lua_pop(L, 1);
   }
 
-  micropather::SetTileCount(tileCount);
-  micropather::SetCosts();
+  mapData.map.SetTileCount(tileCount);
+  mapData.map.SetCosts();
 
   lua_pushnil(L);
-  while (lua_next(L, 1) != 0) {
-    micropather::AddCostTileID(id, lua_tointeger(L, -2));
+  while (lua_next(L, 2) != 0) {
+    mapData.map.AddCostTileID(id, lua_tointeger(L, -2));
 
     if (lua_istable(L, -1)) {
       costID = 0;
       lua_pushnil(L);
 
       while (lua_next(L, -2) != 0) {
-        micropather::AddCost(id, costID, lua_tonumber(L, -1));
+        mapData.map.AddCost(id, costID, lua_tonumber(L, -1));
         lua_pop(L, 1);
         costID++;
 
-        if (costID > micropather::GetWordDirection()) {
+        if (costID > mapData.map.GetWordDirection()) {
           dmLogError("There are more costs than direction. Cost Count: %i, "
                      "Direction: %i",
-                     costID, micropather::GetWordDirection());
+                     costID, mapData.map.GetWordDirection());
           return 0;
         }
       }
@@ -162,73 +187,84 @@ static int astar_set_costs(lua_State *L) {
 }
 
 static int astar_reset_cache(lua_State *L) {
-  micropather::ResetPath();
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.ResetPath();
   return 0;
 }
 
 static int astar_resize_path(lua_State *L) {
-  micropather::ResizePath();
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.ResizePath();
   return 0;
 }
 
 static int astar_reset(lua_State *L) {
-  micropather::Clear();
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  maps.at(_mapId).map.Clear();
   return 0;
 }
 
 static int astar_get_at(lua_State *L) {
-  pathX = luaL_checkint(L, 1) - zero;
-  pathY = luaL_checkint(L, 2) - zero;
-  lua_pushinteger(L, micropather::WorldAt(pathX, pathY));
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+  mapData.pathX = luaL_checkint(L, 2) - mapData.zero;
+  mapData.pathY = luaL_checkint(L, 3) - mapData.zero;
+  lua_pushinteger(L, mapData.map.WorldAt(mapData.pathX, mapData.pathY));
   return 1;
 }
 
 static int astar_set_at(lua_State *L) {
-  pathX = luaL_checkint(L, 1) - zero;
-  pathY = luaL_checkint(L, 2) - zero;
-  micropather::SetToWorldAt(pathX, pathY, luaL_checkint(L, 3));
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+  mapData.pathX = luaL_checkint(L, 2) - mapData.zero;
+  mapData.pathY = luaL_checkint(L, 3) - mapData.zero;
+  mapData.map.SetToWorldAt(mapData.pathX, mapData.pathY, luaL_checkint(L, 4));
   return 0;
 }
 
 static int astar_solve(lua_State *L) {
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+
   uint8_t i = 3;
 
-  micropather::SetPathFromTo(
-      luaL_checkint(L, 1) - zero, luaL_checkint(L, 2) - zero,
-      luaL_checkint(L, 3) - zero, luaL_checkint(L, 4) - zero);
+  mapData.map.SetPathFromTo(
+      luaL_checkint(L, 2) - mapData.zero, luaL_checkint(L, 3) - mapData.zero,
+      luaL_checkint(L, 4) - mapData.zero, luaL_checkint(L, 5) - mapData.zero);
 
-  pathSolved = micropather::Solve();
-  pathSize = micropather::GetPathSize();
-  pathTotalCost = micropather::GetTotalCost();
+  mapData.pathSolved = mapData.map.Solve();
+  mapData.pathSize = mapData.map.GetPathSize();
+  mapData.pathTotalCost = mapData.map.GetTotalCost();
 
   // Early exit if only found itself
-  if (pathSize == 1) {
-    pathSolved = micropather::NO_SOLUTION;
-    pathSize = 0;
+  if (mapData.pathSize == 1) {
+    mapData.pathSolved = micropather::NO_SOLUTION;
+    mapData.pathSize = 0;
   }
 
-  lua_pushinteger(L, pathSolved);
-  lua_pushinteger(L, pathSize);
-  lua_pushnumber(L, pathTotalCost);
+  lua_pushinteger(L, mapData.pathSolved);
+  lua_pushinteger(L, mapData.pathSize);
+  lua_pushnumber(L, mapData.pathTotalCost);
 
-  if (pathSize > 1) {
+  if (mapData.pathSize > 1) {
 
     i++;
-    lua_createtable(L, pathSize, 0);
+    lua_createtable(L, mapData.pathSize, 0);
     int newTable = lua_gettop(L);
 
-    for (int ii = 0; ii < pathSize; ii++) {
-      micropather::NodeToXY(micropather::path[ii], &pathX, &pathY);
+    for (int ii = 0; ii < mapData.pathSize; ii++) {
+      mapData.map.NodeToXY(mapData.map.path[ii], &mapData.pathX,
+                           &mapData.pathY);
 
       lua_createtable(L, 2, 0);
       lua_pushstring(L, "x");
-      lua_pushinteger(L, pathX + zero);
+      lua_pushinteger(L, mapData.pathX + mapData.zero);
       lua_settable(L, -3);
       lua_pushstring(L, "y");
-      lua_pushinteger(L, pathY + zero);
+      lua_pushinteger(L, mapData.pathY + mapData.zero);
       lua_settable(L, -3);
       lua_pushstring(L, "id");
-      lua_pushinteger(L, micropather::WorldAt(pathX, pathY));
+      lua_pushinteger(L, mapData.map.WorldAt(mapData.pathX, mapData.pathY));
       lua_settable(L, -3);
 
       lua_rawseti(L, newTable, ii + 1);
@@ -239,45 +275,49 @@ static int astar_solve(lua_State *L) {
 }
 
 static int astar_solve_near(lua_State *L) {
+  std::string_view _mapId = luaL_checkstring(L, 1);
+  auto &mapData = maps.at(_mapId);
+
   uint8_t i = 2;
 
-  micropather::SetPathFrom(luaL_checkint(L, 1) - zero,
-                           luaL_checkint(L, 2) - zero);
+  mapData.map.SetPathFrom(luaL_checkint(L, 2) - mapData.zero,
+                          luaL_checkint(L, 3) - mapData.zero);
 
-  pathSolved = micropather::SolveNear(luaL_checknumber(L, 3));
-  pathSize = micropather::GetNearsSize();
+  mapData.pathSolved = mapData.map.SolveNear(luaL_checknumber(L, 4));
+  mapData.pathSize = mapData.map.GetNearsSize();
 
   // Early exit if only found itself
-  if (pathSize == 1) {
-    pathSolved = micropather::NO_SOLUTION;
-    pathSize = 0;
+  if (mapData.pathSize == 1) {
+    mapData.pathSolved = micropather::NO_SOLUTION;
+    mapData.pathSize = 0;
   }
 
-  lua_pushinteger(L, pathSolved);
-  lua_pushinteger(L, pathSize);
+  lua_pushinteger(L, mapData.pathSolved);
+  lua_pushinteger(L, mapData.pathSize);
 
-  if (pathSize > 1) {
+  if (mapData.pathSize > 1) {
 
     i++;
-    lua_createtable(L, pathSize, 0);
+    lua_createtable(L, mapData.pathSize, 0);
     int newTable = lua_gettop(L);
 
-    for (int ii = 0; ii < pathSize; ii++) {
+    for (int ii = 0; ii < mapData.pathSize; ii++) {
 
-      micropather::NodeToXY(micropather::nears[ii].state, &pathX, &pathY);
+      mapData.map.NodeToXY(mapData.map.nears[ii].state, &mapData.pathX,
+                           &mapData.pathY);
 
       lua_createtable(L, 2, 0);
       lua_pushstring(L, "x");
-      lua_pushinteger(L, pathX + zero);
+      lua_pushinteger(L, mapData.pathX + mapData.zero);
       lua_settable(L, -3);
       lua_pushstring(L, "y");
-      lua_pushinteger(L, pathY + zero);
+      lua_pushinteger(L, mapData.pathY + mapData.zero);
       lua_settable(L, -3);
       lua_pushstring(L, "cost");
-      lua_pushnumber(L, micropather::nears[ii].cost);
+      lua_pushnumber(L, mapData.map.nears[ii].cost);
       lua_settable(L, -3);
       lua_pushstring(L, "id");
-      lua_pushinteger(L, micropather::WorldAt(pathX, pathY));
+      lua_pushinteger(L, mapData.map.WorldAt(mapData.pathX, mapData.pathY));
       lua_settable(L, -3);
 
       lua_rawseti(L, newTable, ii + 1);

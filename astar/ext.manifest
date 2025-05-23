@@ -3,23 +3,24 @@ name: "astar"
 platforms:
   x86_64-osx:
     context:
-      flags:      ["-std=c++11"]
+      flags:      ["-std=c++17"]
 
   arm64-ios:
     context:
-      flags:      ["-std=c++11"]
+      flags:      ["-std=c++17"]
 
   armv7-ios:
     context:
-      flags:      ["-std=c++11"]
+      flags:      ["-std=c++17"]
 
   x86_64-win32: 
     context:
-      flags:      ["-std=c++11"]
+      flags:      ["-std=c++17"]
 
   js-web : 
     context:
-      flags:      ["-std=c++11","-stdlib=libc++"]
+      flags:      ["-std=c++17","-stdlib=libc++"]
 
-
-      
+  x86_64-linux:
+    context:
+      flags:      ["-std=c++17"]

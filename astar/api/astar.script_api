@@ -6,6 +6,9 @@
       desc: Initial setup. You have to setup the astar before calling any other methods.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: map_width
           type: number
           desc: Width of your map. This is generally width of your tilemap.
@@ -54,7 +57,7 @@
             local cache = true     -- Optional. Default is true
             local flip_map = false -- Optional. Default is false
 
-            astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, flip_map)
+            astar.setup("my_map", map_width, map_height, direction, allocate, typical_adjacent, cache, flip_map)
 
             ```
     - name: use_zero
@@ -65,6 +68,9 @@
         Default is `false` = 1
 
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: toggle
           type: boolean
           desc: true/false
@@ -75,6 +81,9 @@
         * Setting new map data reset the current cache.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: world
           type: table
           desc: Your tilemap data. Keep it simple as much as you can.
@@ -85,6 +94,9 @@
         Table's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: costs
           type: table
           desc: Table of costs for directions.
@@ -93,6 +105,9 @@
       desc: Solves the path.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: start_x
           type: number
           desc: Start tile X.
@@ -123,6 +138,9 @@
       desc: Finds the neighbours according to a given cost.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: start_x
           type: number
           desc: Start tile X.
@@ -146,11 +164,17 @@
     - name: reset_cache
       desc: If your state space is huge, occasionally call `astar.reset_cache()` to free unused memory.
       type: function
-
+      parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
     - name: get_at
       desc: Returns the value from the map array by coordinates.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: x
           type: number
           desc: Tile X.
@@ -166,6 +190,9 @@
       desc: Set your value to the map array by coordinates.
       type: function
       parameters:
+        - name: map_id
+          type: string
+          desc: ID of the map
         - name: x
           type: number
           desc: Tile X.

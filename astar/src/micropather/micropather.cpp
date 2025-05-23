@@ -118,7 +118,7 @@ void MicroPather::GetNodeNeighbors(PathNode *node,
     // Not in the cache. Either the first time or just didn't fit. We don't know
     // the number of neighbors and need to call back to the client.
     stateCostVec.resize(0);
-    AdjacentCost(node->state, &stateCostVec);
+    graph->AdjacentCost(node->state, &stateCostVec);
 
     pNodeCost->resize(stateCostVec.size());
     node->numAdjacent = stateCostVec.size();
@@ -214,7 +214,7 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path,
   ClosedSet closed(graph);
 
   PathNode *newPathNode = pathNodePool.GetPathNode(
-      frame, startNode, 0, LeastCostEstimate(startNode, endNode), 0);
+      frame, startNode, 0, graph->LeastCostEstimate(startNode, endNode), 0);
 
   open.Push(newPathNode);
   stateCostVec.resize(0);
@@ -251,7 +251,7 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path,
           if (newCost < child->costFromStart) {
             child->parent = node;
             child->costFromStart = newCost;
-            child->estToGoal = LeastCostEstimate(child->state, endNode);
+            child->estToGoal = graph->LeastCostEstimate(child->state, endNode);
             child->CalcTotalCost();
             if (inOpen) {
               open.Update(child);
@@ -260,7 +260,7 @@ int MicroPather::Solve(void *startNode, void *endNode, MP_VECTOR<void *> *path,
         } else {
           child->parent = node;
           child->costFromStart = newCost;
-          child->estToGoal = LeastCostEstimate(child->state, endNode),
+          child->estToGoal = graph->LeastCostEstimate(child->state, endNode),
           child->CalcTotalCost();
 
           open.Push(child);

@@ -1,65 +1,45 @@
+#include <cstdio>
+#include <cstring>
 #include <pather.h>
 
 namespace micropather {
 
-Graph *graph = nullptr;
-MicroPather *pather;
-uint8_t result;
-uint16_t worldWidth, worldHeight, tileCount, worldSize;
-uint8_t worldDirection = 8;
-uint8_t typicalAdjacent = 6;
-uint8_t mapType = GRID_CLASSIC;
+int Map::GetWordDirection() { return worldDirection; }
 
-int *world;
-float totalCost;
-bool cache = true;
+int Map::GetWorldSize() { return worldSize; }
 
-Position pathFrom = {0, 0};
-Position pathTo = {0, 0};
-MPVector<void *> path;     // extern
-MPVector<StateCost> nears; // extern
-Tile *Costs;
+int Map::GetPathSize() { return path.size(); }
 
-// Entities
-size_t entitiesSize;
-uint8_t *entities;
-bool getEntity = false;
-bool getNearEntities = false;
+int Map::GetNearsSize() { return nears.size(); }
 
-int GetWordDirection() { return worldDirection; }
+float Map::GetTotalCost() { return totalCost; }
 
-int GetWorldSize() { return worldSize; }
+void Map::SetTileCount(uint16_t _tileCount) { tileCount = _tileCount; }
 
-int GetPathSize() { return path.size(); }
+void Map::SetWorldSize(uint16_t _worldSize) { worldSize = _worldSize; }
 
-int GetNearsSize() { return nears.size(); }
+void Map::SetMapType(uint8_t type) { mapType = type; }
 
-float GetTotalCost() { return totalCost; }
-
-void SetTileCount(uint16_t _tileCount) { tileCount = _tileCount; }
-
-void SetWorldSize(uint16_t _worldSize) { worldSize = _worldSize; }
-
-void SetMapType(uint8_t type) { mapType = type; }
-
-void SetPathFrom(int16_t x, int16_t y) {
+void Map::SetPathFrom(int16_t x, int16_t y) {
   pathFrom.x = x;
   pathFrom.y = y;
 }
 
-void SetPathTo(int16_t x, int16_t y) {
+void Map::SetPathTo(int16_t x, int16_t y) {
   pathTo.x = x;
   pathTo.y = y;
 }
 
-void SetPathFromTo(int16_t from_x, int16_t from_y, int16_t to_x, int16_t to_y) {
+void Map::SetPathFromTo(int16_t from_x, int16_t from_y, int16_t to_x,
+                        int16_t to_y) {
   SetPathFrom(from_x, from_y);
   SetPathTo(to_x, to_y);
 }
 
-void Setup(uint16_t _worldWidth, uint16_t _worldHeight, uint8_t _worldDirection,
-           uint16_t _allocate, uint16_t _typicalAdjacent, bool _cache) {
-
+void Map::Setup(uint16_t _worldWidth, uint16_t _worldHeight,
+                uint8_t _worldDirection, uint16_t _allocate,
+                uint16_t _typicalAdjacent, bool _cache) {
+  printf("CALLED CONSTRUCTOR\n");
   if (pather != NULL) {
     Clear();
     pather = NULL;
@@ -68,17 +48,23 @@ void Setup(uint16_t _worldWidth, uint16_t _worldHeight, uint8_t _worldDirection,
   worldWidth = _worldWidth;
   worldHeight = _worldHeight;
   worldDirection = _worldDirection;
+
+  printf("CALLED SETWORLDSIZE\n");
+
   SetWorldSize(worldWidth * worldHeight);
+  printf("CALLED MALLOC\n");
 
   world = (int *)malloc(sizeof(int) * worldSize);
+  printf("CALLED MEMSET\n");
 
   memset(world, 0,
          sizeof(int) * worldSize); // Set all to 0
+  printf("CALLED MICROPATHER\n");
 
-  pather = new MicroPather(graph, _allocate, _typicalAdjacent, _cache);
+  pather = new MicroPather(this, _allocate, _typicalAdjacent, _cache);
 }
 
-void SetCosts() {
+void Map::SetCosts() {
   ResizePath();
   ResetPath();
 
@@ -90,21 +76,23 @@ void SetCosts() {
   }
 }
 
-void AddCostTileID(uint16_t id, uint16_t tileID) { Costs[id].tile_id = tileID; }
+void Map::AddCostTileID(uint16_t id, uint16_t tileID) {
+  Costs[id].tile_id = tileID;
+}
 
-void AddCost(uint16_t id, uint16_t costID, float cost) {
+void Map::AddCost(uint16_t id, uint16_t costID, float cost) {
   Costs[id].costs[costID] = cost;
 }
 
 // NOT USING ANYMORE
-void SetMap(int *_world) {
+void Map::SetMap(int *_world) {
   ResetPath();
   memcpy(world, _world, sizeof(int) * GetWorldSize());
 }
 
-void SetTile(uint16_t id, int tile) { world[id] = tile; }
+void Map::SetTile(uint16_t id, int tile) { world[id] = tile; }
 
-void MapVFlip() {
+void Map::MapVFlip() {
   for (uint16_t y = 0; y < worldHeight / 2; ++y) {
     for (uint16_t x = 0; x < worldWidth; ++x) {
       int temp = world[y * worldWidth + x];
@@ -114,7 +102,7 @@ void MapVFlip() {
   }
 }
 
-void MapHFlip() {
+void Map::MapHFlip() {
   for (uint16_t i = 0; i < worldHeight; ++i) {
     for (uint16_t j = 0; j < worldWidth / 2; ++j) {
       int temp = world[i * worldWidth + j];
@@ -124,12 +112,12 @@ void MapHFlip() {
   }
 }
 
-void UseEntities(bool toggle) {
+void Map::UseEntities(bool toggle) {
   ResetPath();
   getEntity = toggle;
 }
 
-void PrintMap(uint8_t zero) {
+void Map::PrintMap(uint8_t zero) {
   int row = 0 + zero;
 
   printf("cols/x:\n");
@@ -151,14 +139,14 @@ void PrintMap(uint8_t zero) {
   }
 }
 
-void SetEntityCount(size_t size) {
+void Map::SetEntityCount(size_t size) {
   entitiesSize = size;
   entities = (uint8_t *)malloc(sizeof(uint8_t) * entitiesSize);
 }
-void SetEntity(uint8_t id, int16_t entityID) { entities[id] = entityID; }
+void Map::SetEntity(uint8_t id, int16_t entityID) { entities[id] = entityID; }
 
 // NOT USING ANYMORE
-void SetEntities(uint8_t *_entities, size_t size) {
+void Map::SetEntities(uint8_t *_entities, size_t size) {
   ResetPath();
 
   entitiesSize = size;
@@ -167,15 +155,15 @@ void SetEntities(uint8_t *_entities, size_t size) {
   memcpy(entities, _entities, sizeof(uint8_t) * size);
 }
 
-void ResizePath() { path.resize(0); }
+void Map::ResizePath() { path.resize(0); }
 
-void ResetPath() {
+void Map::ResetPath() {
   if (pather != NULL) {
     pather->Reset();
   }
 }
 
-int WorldAt(int16_t x, int16_t y) {
+int Map::WorldAt(int16_t x, int16_t y) {
   if (x >= 0 && x < worldWidth && y >= 0 && y < worldHeight) {
     return world[y * worldWidth + x];
   } else {
@@ -183,22 +171,22 @@ int WorldAt(int16_t x, int16_t y) {
   }
 }
 
-void SetToWorldAt(int16_t x, int16_t y, int value) {
+void Map::SetToWorldAt(int16_t x, int16_t y, int value) {
   if (x >= 0 && x < worldWidth && y >= 0 && y < worldHeight) {
     ResetPath();
     world[y * worldWidth + x] = value;
   }
 }
 
-void NodeToXY(void *node, int16_t *x, int16_t *y) {
+void Map::NodeToXY(void *node, int16_t *x, int16_t *y) {
   intptr_t index = (intptr_t)node;
   *y = (int)index / worldWidth;
   *x = (int)index - *y * worldWidth;
 }
 
-void *XYToNode(size_t x, size_t y) { return (void *)(y * worldWidth + x); }
+void *Map::XYToNode(size_t x, size_t y) { return (void *)(y * worldWidth + x); }
 
-float LeastCostEstimate(void *nodeStart, void *nodeEnd) {
+float Map::LeastCostEstimate(void *nodeStart, void *nodeEnd) {
   int16_t xStart, yStart, xEnd, yEnd;
   NodeToXY(nodeStart, &xStart, &yStart);
   NodeToXY(nodeEnd, &xEnd, &yEnd);
@@ -216,7 +204,7 @@ float LeastCostEstimate(void *nodeStart, void *nodeEnd) {
   return 0.0f;
 }
 
-int Passable(int16_t nx, int16_t ny) {
+int Map::Passable(int16_t nx, int16_t ny) {
   if (nx >= 0 && nx < worldWidth && ny >= 0 && ny < worldHeight) {
     int index = ny * worldWidth + nx;
     int c = world[index];
@@ -238,14 +226,15 @@ int Passable(int16_t nx, int16_t ny) {
   return -1;
 }
 
-void PushNeighbors(StateCost *nodeCost, MPVector<StateCost> *neighbors,
-                   int16_t *nx, int16_t *ny, unsigned int a, unsigned int b) {
+void Map::PushNeighbors(StateCost *nodeCost, MPVector<StateCost> *neighbors,
+                        int16_t *nx, int16_t *ny, unsigned int a,
+                        unsigned int b) {
   nodeCost->state = XYToNode(*nx, *ny);
   nodeCost->cost = Costs[a].costs[b];
   neighbors->push_back(*nodeCost);
 }
 
-void AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
+void Map::AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
   int16_t x, y, nx, ny, pass;
   NodeToXY(node, &x, &y);
   StateCost nodeCost;
@@ -321,7 +310,7 @@ void AdjacentCost(void *node, MPVector<StateCost> *neighbors) {
   }
 }
 
-int Solve() {
+int Map::Solve() {
 
   if (pather == NULL) {
     dmLogError("You have to setup the astar using astar.setup()\n");
@@ -346,7 +335,7 @@ int Solve() {
   return result;
 }
 
-int SolveNear(float maxCost) {
+int Map::SolveNear(float maxCost) {
   if (pather == NULL) {
     dmLogError("You have to setup the astar using astar.setup()\n");
     return NO_SOLUTION;
@@ -372,7 +361,7 @@ int SolveNear(float maxCost) {
   return result;
 }
 
-void Clear() {
+void Map::Clear() {
   ResetPath();
   if (Costs != NULL) {
     for (unsigned int a = 0; a < tileCount; a = a + 1) {
@@ -390,4 +379,5 @@ void Clear() {
   }
 }
 
+void Map::PrintStateInfo(void *state) {};
 } // namespace micropather

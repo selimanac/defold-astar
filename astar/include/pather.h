@@ -3,12 +3,9 @@
 #include "dmsdk/dlib/log.h"
 #include <math.h>
 #include <micropather/micropather.h>
+#include <string_view>
 
 namespace micropather {
-
-extern MPVector<void *> path;
-extern MPVector<StateCost> nears;
-
 struct Position {
   int16_t x;
   int16_t y;
@@ -51,56 +48,83 @@ const int dy[8] = {
     -1  // SE
 };
 
-void Initialize();
+class Map : Graph {
+public:
+  MicroPather *pather;
+  uint8_t result;
+  uint16_t worldWidth, worldHeight, tileCount, worldSize;
+  uint8_t worldDirection = 8;
+  uint8_t typicalAdjacent = 6;
+  uint8_t mapType = GRID_CLASSIC;
 
-void Setup(uint16_t _worldWidth, uint16_t _worldHeight,
-           uint8_t _worldDirection = 8, uint16_t _allocate = 250,
-           uint16_t _typicalAdjacent = 6, bool _cache = true);
+  int *world;
+  float totalCost;
+  bool cache = true;
 
-// Helper Get/Set
-int GetWordDirection();
-int GetWorldSize();
+  Position pathFrom = {0, 0};
+  Position pathTo = {0, 0};
+  MPVector<void *> path;     // extern
+  MPVector<StateCost> nears; // extern
+  Tile *Costs;
 
-int GetPathSize();
-int GetNearsSize();
-float GetTotalCost();
+  // Entities
+  size_t entitiesSize;
+  uint8_t *entities;
+  bool getEntity = false;
+  bool getNearEntities = false;
 
-void SetTileCount(uint16_t _tileCount);
-void SetWorldSize(uint16_t _worldSize);
-void SetPathFrom(int16_t x, int16_t y);
-void SetPathTo(int16_t x, int16_t y);
-void SetPathFromTo(int16_t from_x, int16_t from_y, int16_t to_x, int16_t to_y);
+  void Initialize();
 
-void SetCosts();
-void AddCostTileID(uint16_t id, uint16_t tileID);
-void AddCost(uint16_t id, uint16_t costID, float cost);
-void SetMapType(uint8_t type);
-void SetMap(int *_world); // NOT USING ANYMORE
-void MapVFlip();
-void MapHFlip();
-void PrintMap(uint8_t zero);
-void SetTile(uint16_t id, int tile);
-void SetEntities(uint8_t *_entities, size_t size); // NOT USING ANYMORE
-void SetEntityCount(size_t size);
-void SetEntity(uint8_t id, int16_t entityID);
-void UseEntities(bool toggle);
+  void Setup(uint16_t _worldWidth, uint16_t _worldHeight,
+             uint8_t _worldDirection = 8, uint16_t _allocate = 250,
+             uint16_t _typicalAdjacent = 6, bool _cache = true);
 
-int WorldAt(int16_t x, int16_t y);
-void SetToWorldAt(int16_t x, int16_t y, int value);
-void NodeToXY(void *node, int16_t *x, int16_t *y);
-void *XYToNode(size_t x, size_t y);
-void PushNeighbors(StateCost *nodeCost, MPVector<StateCost> *neighbors,
-                   int16_t *nx, int16_t *ny, unsigned int a, unsigned int b);
+  // Helper Get/Set
+  int GetWordDirection();
+  int GetWorldSize();
 
-float LeastCostEstimate(void *nodeStart, void *nodeEnd);       // extern
-void AdjacentCost(void *node, MPVector<StateCost> *neighbors); // extern
+  int GetPathSize();
+  int GetNearsSize();
+  float GetTotalCost();
 
-int Passable(int16_t nx, int16_t ny);
-int Solve();
-int SolveNear(float maxCost);
-void Clear();
+  void SetTileCount(uint16_t _tileCount);
+  void SetWorldSize(uint16_t _worldSize);
+  void SetPathFrom(int16_t x, int16_t y);
+  void SetPathTo(int16_t x, int16_t y);
+  void SetPathFromTo(int16_t from_x, int16_t from_y, int16_t to_x,
+                     int16_t to_y);
 
-void ResetPath();
-void ResizePath();
+  void SetCosts();
+  void AddCostTileID(uint16_t id, uint16_t tileID);
+  void AddCost(uint16_t id, uint16_t costID, float cost);
+  void SetMapType(uint8_t type);
+  void SetMap(int *_world); // NOT USING ANYMORE
+  void MapVFlip();
+  void MapHFlip();
+  void PrintMap(uint8_t zero);
+  void SetTile(uint16_t id, int tile);
+  void SetEntities(uint8_t *_entities, size_t size); // NOT USING ANYMORE
+  void SetEntityCount(size_t size);
+  void SetEntity(uint8_t id, int16_t entityID);
+  void UseEntities(bool toggle);
 
+  int WorldAt(int16_t x, int16_t y);
+  void SetToWorldAt(int16_t x, int16_t y, int value);
+  void NodeToXY(void *node, int16_t *x, int16_t *y);
+  void *XYToNode(size_t x, size_t y);
+  void PushNeighbors(StateCost *nodeCost, MPVector<StateCost> *neighbors,
+                     int16_t *nx, int16_t *ny, unsigned int a, unsigned int b);
+
+  float LeastCostEstimate(void *nodeStart, void *nodeEnd);
+  void AdjacentCost(void *node, MPVector<StateCost> *neighbors);
+  void PrintStateInfo(void *state);
+
+  int Passable(int16_t nx, int16_t ny);
+  int Solve();
+  int SolveNear(float maxCost);
+  void Clear();
+
+  void ResetPath();
+  void ResizePath();
+};
 } // namespace micropather
