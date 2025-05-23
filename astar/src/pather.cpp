@@ -39,7 +39,6 @@ void Map::SetPathFromTo(int16_t from_x, int16_t from_y, int16_t to_x,
 void Map::Setup(uint16_t _worldWidth, uint16_t _worldHeight,
                 uint8_t _worldDirection, uint16_t _allocate,
                 uint16_t _typicalAdjacent, bool _cache) {
-  printf("CALLED CONSTRUCTOR\n");
   if (pather != NULL) {
     Clear();
     pather = NULL;
@@ -49,17 +48,12 @@ void Map::Setup(uint16_t _worldWidth, uint16_t _worldHeight,
   worldHeight = _worldHeight;
   worldDirection = _worldDirection;
 
-  printf("CALLED SETWORLDSIZE\n");
-
   SetWorldSize(worldWidth * worldHeight);
-  printf("CALLED MALLOC\n");
 
   world = (int *)malloc(sizeof(int) * worldSize);
-  printf("CALLED MEMSET\n");
 
   memset(world, 0,
          sizeof(int) * worldSize); // Set all to 0
-  printf("CALLED MICROPATHER\n");
 
   pather = new MicroPather(this, _allocate, _typicalAdjacent, _cache);
 }
