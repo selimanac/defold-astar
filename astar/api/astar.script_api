@@ -6,9 +6,6 @@
       desc: Initial setup. You have to setup the astar before calling any other methods.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: map_width
           type: number
           desc: Width of your map. This is generally width of your tilemap.
@@ -45,6 +42,9 @@
         - name: map_vflip[optional]
           type: boolean
           desc: Flips the map vertically. This doesn't flip the coordinates. Also you can set it by call `astar.map_vflip()`. Default is `false`
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
       examples:
         - desc: |-
             ```lua
@@ -68,12 +68,12 @@
         Default is `false` = 1
 
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: toggle
           type: boolean
           desc: true/false
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
 
     - name: set_map
       desc: Set your map data.
@@ -81,12 +81,12 @@
         * Setting new map data reset the current cache.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: world
           type: table
           desc: Your tilemap data. Keep it simple as much as you can.
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
 
     - name: set_costs
       desc: Set costs for walkable tiles on your `world` table. This table keys determine the walkable area.
@@ -94,20 +94,17 @@
         Table's sum must be the `astar.DIRECTION_FOUR` or `astar.DIRECTION_EIGHT`.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: costs
           type: table
           desc: Table of costs for directions.
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
 
     - name: solve
       desc: Solves the path.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: start_x
           type: number
           desc: Start tile X.
@@ -120,6 +117,9 @@
         - name: end_y
           type: number
           desc: End tile Y.
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
       returns:
         - name: result
           type: number
@@ -138,9 +138,6 @@
       desc: Finds the neighbours according to a given cost.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: start_x
           type: number
           desc: Start tile X.
@@ -150,6 +147,9 @@
         - name: max_cost
           type: number
           desc: Maximum cost for finding neighbours.
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
       returns:
         - name: near_result
           type: number
@@ -165,22 +165,22 @@
       desc: If your state space is huge, occasionally call `astar.reset_cache()` to free unused memory.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
     - name: get_at
       desc: Returns the value from the map array by coordinates.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: x
           type: number
           desc: Tile X.
         - name: y
           type: number
           desc: Tile Y.
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
       returns:
         - name: value
           type: number
@@ -190,9 +190,6 @@
       desc: Set your value to the map array by coordinates.
       type: function
       parameters:
-        - name: map_id
-          type: string
-          desc: ID of the map
         - name: x
           type: number
           desc: Tile X.
@@ -202,6 +199,9 @@
         - name: value
           type: number
           desc: The value to set.
+        - name: map_id[optional]
+          type: number
+          desc: ID of the map. Has to be an integer from 0 to 2^16 - 1. Default is `0`.
 
     - name: SOLVED
       type: number
