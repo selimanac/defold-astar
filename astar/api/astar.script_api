@@ -2,6 +2,20 @@
   type: table
   desc: A* Path Finding
   members:
+    - name: new_map_id
+      desc: Get a new self-incrementing map_id.
+      type: function
+      returns:
+        - name: map_id
+          type: number
+          desc: ID of a new map.
+    - name: delete_map
+      desc: Delete a map by its ID. This will free the memory used by the map.
+      type: function
+      parameters:
+        - name: map_id
+          type: number
+          desc: ID of the map to delete. Has to be an integer from 0 to 2^16 - 1.
     - name: setup
       desc: Initial setup. You have to setup the astar before calling any other methods.
       type: function

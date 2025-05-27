@@ -1,3 +1,4 @@
+#include "dmsdk/lua/lua.h"
 #define LIB_NAME "Astar"
 #define MODULE_NAME "astar"
 #define DLIB_LOG_DOMAIN "ASTAR"
@@ -19,11 +20,29 @@ struct MapData {
 };
 
 static const uint16_t defaultMapId = 0;
+static uint16_t nextMapId = defaultMapId;
 
 static dmHashTable16<MapData *> maps;
 
-static void use_zero(MapData *mapData, bool _zero) {
-  mapData->zero = (_zero) ? 0 : 1;
+static MapData *get_or_create_mapdata(uint16_t mapId) {
+  MapData **mapDataPtr = maps.Get(mapId);
+  if (mapDataPtr == NULL) {
+    if (maps.Full()) {
+      maps.OffsetCapacity(maps.Capacity() * 2);
+    }
+    MapData *mapData = new MapData();
+    maps.Put(mapId, mapData);
+    return mapData;
+  } else {
+    return *mapDataPtr;
+  }
+}
+
+static uint16_t new_map_id() {
+  while (maps.Get(nextMapId) != NULL) {
+    nextMapId++;
+  }
+  return nextMapId;
 }
 
 static MapData *get_map(lua_State *L, int nArg) {
@@ -32,11 +51,36 @@ static MapData *get_map(lua_State *L, int nArg) {
   if (mapData == NULL) {
     dmLogError(
         "Map %" PRIu16
-        " doesn't exist. You have to setup the astar using astar.setup()\n",
+        " doesn't exist. You have to create the map using astar.create_map()\n",
         _mapId);
     return NULL;
   }
   return *mapData;
+}
+
+static void delete_map(uint16_t mapId) {
+  MapData **mapDataPtr = maps.Get(mapId);
+  if (mapDataPtr != NULL) {
+    MapData *mapData = *mapDataPtr;
+    delete mapData;
+    maps.Erase(mapId);
+  }
+}
+
+static int astar_new_map_id(lua_State *L) {
+  uint16_t _mapId = new_map_id();
+  lua_pushinteger(L, _mapId);
+  return 1;
+}
+
+static int astar_delete_map(lua_State *L) {
+  uint16_t _mapId = luaL_checkinteger(L, 1);
+  delete_map(_mapId);
+  return 0;
+}
+
+static void use_zero(MapData *mapData, bool _zero) {
+  mapData->zero = (_zero) ? 0 : 1;
 }
 
 static int astar_setup(lua_State *L) {
@@ -62,17 +106,7 @@ static int astar_setup(lua_State *L) {
   }
 
   uint16_t _mapId = luaL_optinteger(L, 9, defaultMapId);
-  MapData **mapDataPtr = maps.Get(_mapId);
-  MapData *mapData;
-  if (mapDataPtr == NULL) {
-    if (maps.Full()) {
-      maps.OffsetCapacity(maps.Capacity() * 2);
-    }
-    mapData = new MapData();
-    maps.Put(_mapId, mapData);
-  } else {
-    mapData = *mapDataPtr;
-  }
+  MapData *mapData = get_or_create_mapdata(_mapId);
 
   mapData->mapVFlip = _mapVFlip;
 
@@ -428,6 +462,8 @@ static const luaL_reg Module_methods[] = {{"solve_near", astar_solve_near},
                                           {"print_map", astar_print_map},
                                           {"map_vflip", astar_map_vflip},
                                           {"map_hflip", astar_map_hflip},
+                                          {"new_map_id", astar_new_map_id},
+                                          {"delete_map", astar_delete_map},
                                           {0, 0}
 
 };
