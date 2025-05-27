@@ -1,4 +1,3 @@
-#include "dmsdk/lua/lua.h"
 #define LIB_NAME "Astar"
 #define MODULE_NAME "astar"
 #define DLIB_LOG_DOMAIN "ASTAR"
