@@ -50,7 +50,7 @@ static MapData *get_map(lua_State *L, int nArg) {
   if (mapData == NULL) {
     dmLogError(
         "Map %" PRIu16
-        " doesn't exist. You have to create the map using astar.create_map()\n",
+        " doesn't exist. You have to setup the map using astar.setup()\n",
         _mapId);
     return NULL;
   }
