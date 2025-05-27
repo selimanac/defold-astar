@@ -21,5 +21,6 @@ platforms:
     context:
       flags:      ["-std=c++11","-stdlib=libc++"]
 
-
-      
+  x86_64-linux:
+    context:
+      flags:      ["-std=c++11"]

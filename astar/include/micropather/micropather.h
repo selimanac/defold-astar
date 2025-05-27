@@ -62,10 +62,6 @@ typedef unsigned MP_UPTR;
 
 namespace micropather {
 
-// EXTERNS ADDED
-extern float LeastCostEstimate(void *nodeStart, void *nodeEnd);
-extern void AdjacentCost(void *node, MPVector<StateCost> *neighbors);
-
 struct CacheData {
   CacheData()
       : nBytesAllocated(0), nBytesUsed(0), memoryFraction(0), hit(0), miss(0),
