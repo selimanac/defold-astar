@@ -32,22 +32,27 @@ function astar.use_zero(toggle, map_id) end
 function astar.set_map(world, map_id) end
 
 --- Flip the map vertically (does not flip coordinates).
-function astar.map_vflip() end
+---@param map_id? number ID of the map. Default is 0.
+function astar.map_vflip(map_id) end
 
 --- Flip the map horizontally (does not flip coordinates).
-function astar.map_hflip() end
+---@param map_id? number ID of the map. Default is 0.
+function astar.map_hflip(map_id) end
 
 --- Set the map coordinate type.
 -- @param type (number) One of astar.GRID_CLASSIC, astar.HEX_ODDR, astar.HEX_EVENR, astar.HEX_ODDQ, or astar.HEX_EVENQ.
-function astar.set_map_type(type) end
+---@param map_id? number ID of the map. Default is 0.
+function astar.set_map_type(type, map_id) end
 
 --- Define entity tile IDs that are not passable.
 -- @param entities (table) List of entity tile IDs (e.g., {1, 2}).
-function astar.set_entities(entities) end
+---@param map_id? number ID of the map. Default is 0.
+function astar.set_entities(entities, map_id) end
 
 --- Enable or disable entity use during solve.
 -- @param toggle (boolean) Whether to include entities in pathfinding.
-function astar.use_entities(toggle) end
+---@param map_id? number ID of the map. Default is 0.
+function astar.use_entities(toggle, map_id) end
 
 ---@param costs table Table of costs for directions.
 ---@param map_id? number ID of the map. Default is 0.
@@ -84,7 +89,8 @@ function astar.get_at(x, y, map_id) end
 function astar.set_at(x, y, value, map_id) end
 
 --- Print the current map to the console for debugging.
-function astar.print_map() end
+---@param map_id? number ID of the map. Default is 0.
+function astar.print_map(map_id) end
 
 --- Fully reset the pathfinding system and free memory.
 function astar.reset() end

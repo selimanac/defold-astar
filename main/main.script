@@ -30,14 +30,16 @@ local entities = {
 }
 
 function init(self)
-	astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, use_zero, map_vflip)
-	astar.set_map(world)
-	astar.set_costs(costs)
-	astar.set_entities(entities)
-	astar.use_entities(true)
-	astar.print_map()
+	local map_id = astar.new_map_id()
 
-	local status, size, total_cost, path = astar.solve(5, 1, 1, 4)
+	astar.setup(map_width, map_height, direction, allocate, typical_adjacent, cache, use_zero, map_vflip, map_id)
+	astar.set_map(world, map_id)
+	astar.set_costs(costs, map_id)
+	astar.set_entities(entities, map_id)
+	astar.use_entities(true, map_id)
+	astar.print_map(map_id)
+
+	local status, size, total_cost, path = astar.solve(5, 1, 1, 4, map_id)
 
 	if status == astar.SOLVED then
 		print("PATH SOLVED")
@@ -53,9 +55,9 @@ function init(self)
 		print("START_END_SAME")
 	end
 
-	astar.use_entities(false)
+	astar.use_entities(false, map_id)
 
-	local near_status, near_size, nears = astar.solve_near(3, 4, 1.0)
+	local near_status, near_size, nears = astar.solve_near(3, 4, 1.0, map_id)
 
 	if near_status == astar.SOLVED then
 		print("NEAR SOLVED")

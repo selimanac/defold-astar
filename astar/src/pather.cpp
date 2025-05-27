@@ -304,47 +304,41 @@ namespace micropather
         neighbors->push_back(*nodeCost);
     }
 
+    inline void GetNextCoordinate(uint8_t mapType, int16_t x, int16_t y, uint8_t direction, bool isOddX, bool isOddY, int16_t* nx, int16_t* ny)
+    {
+        if (mapType == GRID_CLASSIC)
+        {
+            *nx = x + dx[direction];
+            *ny = y + dy[direction];
+        }
+        else if (mapType == HEX_ODDR || mapType == HEX_EVENR)
+        {
+            int idx = !isOddY ? 0 : 2;
+            *nx = x + OffsetCoordinates[mapType][idx][direction];
+            *ny = y + OffsetCoordinates[mapType][idx + 1][direction];
+        }
+        else if (mapType == HEX_ODDQ || mapType == HEX_EVENQ)
+        {
+            int idx = !isOddX ? 0 : 2;
+            *nx = x + OffsetCoordinates[mapType][idx][direction];
+            *ny = y + OffsetCoordinates[mapType][idx + 1][direction];
+        }
+    }
+
     void Map::AdjacentCost(void* node, MPVector<StateCost>* neighbors)
     {
         int16_t x, y, nx, ny, pass;
         NodeToXY(node, &x, &y);
         StateCost nodeCost;
 
-        for (unsigned int a = 0; a < tileCount; a = a + 1)
+        bool      isOddY = (y % 2 != 0);
+        bool      isOddX = (x % 2 != 0);
+
+        for (unsigned int a = 0; a < tileCount; ++a)
         {
-            for (unsigned int b = 0; b < worldDirection; b = b + 1)
+            for (unsigned int b = 0; b < worldDirection; ++b)
             {
-                if (mapType == GRID_CLASSIC)
-                {
-                    nx = x + dx[b];
-                    ny = y + dy[b];
-                }
-                else if (mapType == HEX_ODDR || mapType == HEX_EVENR)
-                {
-                    if (y % 2 == 0)
-                    {
-                        nx = x + OffsetCoordinates[mapType][0][b];
-                        ny = y + OffsetCoordinates[mapType][1][b];
-                    }
-                    else
-                    {
-                        nx = x + OffsetCoordinates[mapType][2][b];
-                        ny = y + OffsetCoordinates[mapType][3][b];
-                    }
-                }
-                else if (mapType == HEX_ODDQ || mapType == HEX_EVENQ)
-                {
-                    if (x % 2 == 0)
-                    {
-                        nx = x + OffsetCoordinates[mapType][0][b];
-                        ny = y + OffsetCoordinates[mapType][1][b];
-                    }
-                    else
-                    {
-                        nx = x + OffsetCoordinates[mapType][2][b];
-                        ny = y + OffsetCoordinates[mapType][3][b];
-                    }
-                }
+                GetNextCoordinate(mapType, x, y, b, isOddX, isOddY, &nx, &ny);
 
                 pass = Passable(nx, ny);
 
