@@ -14,10 +14,7 @@ or you can add stable versions from [releases](https://github.com/selimanac/defo
 ## Examples
 
 Hexagon example: https://github.com/selimanac/defold-astar-hex-example    
-Basic tilemap example: https://github.com/selimanac/defold-astar-tilemap-example
-
-Old examples: https://github.com/selimanac/defold-astar-examples
-
+Basic tilemap, entities, and multi-map example: https://github.com/selimanac/defold-astar-tilemap-example
 
 ## Forum
 
@@ -26,7 +23,6 @@ https://forum.defold.com/t/a-native-extension/
 ## Toss a Coin to Your Witcher
 If you find my [Defold Extensions](https://github.com/selimanac) useful for your projects, please consider [supporting](https://github.com/sponsors/selimanac) it.  
 I'd love to hear about your projects! Please share your released projects that use my native extensions. It would be very motivating for me.
-
 
 ## Release Notes
 
