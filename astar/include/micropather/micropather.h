@@ -60,62 +60,63 @@ typedef uintptr_t MP_UPTR;
 typedef unsigned MP_UPTR;
 #endif
 
-namespace micropather {
+namespace micropather
+{
 
-// EXTERNS ADDED
-extern float LeastCostEstimate(void *nodeStart, void *nodeEnd);
-extern void AdjacentCost(void *node, MPVector<StateCost> *neighbors);
+    struct CacheData
+    {
+        CacheData()
+            : nBytesAllocated(0)
+            , nBytesUsed(0)
+            , memoryFraction(0)
+            , hit(0)
+            , miss(0)
+            , hitFraction(0)
+        {
+        }
+        int   nBytesAllocated;
+        int   nBytesUsed;
+        float memoryFraction;
+        int   hit;
+        int   miss;
+        float hitFraction;
+    };
 
-struct CacheData {
-  CacheData()
-      : nBytesAllocated(0), nBytesUsed(0), memoryFraction(0), hit(0), miss(0),
-        hitFraction(0) {}
-  int nBytesAllocated;
-  int nBytesUsed;
-  float memoryFraction;
-  int hit;
-  int miss;
-  float hitFraction;
-};
+    class MicroPather
+    {
+        friend class micropather::PathNode;
 
-class MicroPather {
-  friend class micropather::PathNode;
+        public:
+        MicroPather(Graph* graph, unsigned allocate = 250, unsigned typicalAdjacent = 6, bool cache = true);
+        ~MicroPather();
 
-public:
-  MicroPather(Graph *graph, unsigned allocate = 250,
-              unsigned typicalAdjacent = 6, bool cache = true);
-  ~MicroPather();
+        int  Solve(void* startState, void* endState, MP_VECTOR<void*>* path, float* totalCost);
 
-  int Solve(void *startState, void *endState, MP_VECTOR<void *> *path,
-            float *totalCost);
+        int  SolveForNearStates(void* startState, MP_VECTOR<StateCost>* near, float maxCost);
 
-  int SolveForNearStates(void *startState, MP_VECTOR<StateCost> *near,
-                         float maxCost);
+        void Reset();
 
-  void Reset();
+        void StatesInPool(MP_VECTOR<void*>* stateVec);
+        void GetCacheData(CacheData* data);
 
-  void StatesInPool(MP_VECTOR<void *> *stateVec);
-  void GetCacheData(CacheData *data);
+        private:
+        MicroPather(const MicroPather&);                   // undefined and unsupported
+        void                 operator=(const MicroPather); // undefined and unsupported
 
-private:
-  MicroPather(const MicroPather &);  // undefined and unsupported
-  void operator=(const MicroPather); // undefined and unsupported
+        void                 GoalReached(PathNode* node, void* start, void* end, MP_VECTOR<void*>* path);
 
-  void GoalReached(PathNode *node, void *start, void *end,
-                   MP_VECTOR<void *> *path);
+        void                 GetNodeNeighbors(PathNode* node, MP_VECTOR<NodeCost>* neighborNode);
 
-  void GetNodeNeighbors(PathNode *node, MP_VECTOR<NodeCost> *neighborNode);
+        PathNodePool         pathNodePool;
+        MP_VECTOR<StateCost> stateCostVec;
+        MP_VECTOR<NodeCost>  nodeCostVec;
+        MP_VECTOR<float>     costVec;
 
-  PathNodePool pathNodePool;
-  MP_VECTOR<StateCost> stateCostVec;
-  MP_VECTOR<NodeCost> nodeCostVec;
-  MP_VECTOR<float> costVec;
+        Graph*               graph;
+        unsigned             frame;
 
-  Graph *graph;
-  unsigned frame;
-
-  PathCache *pathCache;
-};
+        PathCache*           pathCache;
+    };
 }; // namespace micropather
 
 #endif
