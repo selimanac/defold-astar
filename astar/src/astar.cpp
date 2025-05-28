@@ -18,19 +18,19 @@ struct MapData
     int16_t          pathX, pathY;
 };
 
-static const uint16_t          defaultMapId = 0;
-static uint16_t                nextMapId = defaultMapId;
+static const uint16_t                  defaultMapId = 0;
+static uint16_t                        nextMapId = defaultMapId;
+static dmHashTable<uint16_t, MapData*> maps;
 
-static dmHashTable16<MapData*> maps;
-
-static MapData*                get_or_create_mapdata(uint16_t mapId)
+//
+static MapData* get_or_create_mapdata(uint16_t mapId)
 {
     MapData** mapDataPtr = maps.Get(mapId);
     if (mapDataPtr == NULL)
     {
         if (maps.Full())
         {
-            maps.OffsetCapacity(maps.Capacity() * 2);
+            maps.SetCapacity(maps.Capacity() * 2, maps.Capacity() * 2); // for 1.9.7 sdk compability
         }
         MapData* mapData = new MapData();
         maps.Put(mapId, mapData);
@@ -580,7 +580,7 @@ static void LuaInit(lua_State* L)
 
 dmExtension::Result AppInitializeAstar(dmExtension::AppParams* params)
 {
-    maps.SetCapacity(1);
+    maps.SetCapacity(1, 1); // for 1.9.7 sdk compability
     return dmExtension::RESULT_OK;
 }
 
