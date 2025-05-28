@@ -14,7 +14,9 @@ or you can add stable versions from [releases](https://github.com/selimanac/defo
 ## Examples
 
 Hexagon example: https://github.com/selimanac/defold-astar-hex-example    
-Basic tilemap, entities, and multi-map example: https://github.com/selimanac/defold-astar-tilemap-example
+Basic tilemap, entities, and multi-map example: https://github.com/selimanac/defold-astar-tilemap-example  
+
+[benjames](https://github.com/benjames-171)'s xfire:  https://github.com/benjames-171/xfire/tree/main
 
 ## Forum
 
