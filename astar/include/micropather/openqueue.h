@@ -5,7 +5,6 @@
 
 namespace micropather
 {
-
     class OpenQueue
     {
         public:

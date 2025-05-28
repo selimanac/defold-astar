@@ -7,7 +7,6 @@
 
 namespace micropather
 {
-
     template <typename T>
     class MPVector
     {
@@ -18,14 +17,17 @@ namespace micropather
             , m_buf(0)
         {
         }
+
         ~MPVector()
         {
             delete[] m_buf;
         }
+
         void clear()
         {
             m_size = 0;
-        } // see warning above
+        }
+
         void resize(unsigned s)
         {
             capacity(s);

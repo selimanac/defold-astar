@@ -72,6 +72,7 @@ static void delete_map(uint16_t mapId)
     if (mapDataPtr != NULL)
     {
         MapData* mapData = *mapDataPtr;
+        mapData->map.Clear();
         delete mapData;
         maps.Erase(mapId);
     }
@@ -348,12 +349,13 @@ static int astar_resize_path(lua_State* L)
 
 static int astar_reset(lua_State* L)
 {
-    MapData* mapData = get_map(L, 1);
-    if (mapData == NULL)
+    dmHashTable16<MapData*>::Iterator it = maps.GetIterator();
+    while (it.Next())
     {
-        return 0;
+        MapData* mapData = it.GetValue();
+        mapData->map.Clear();
     }
-    mapData->map.Clear();
+
     return 0;
 }
 

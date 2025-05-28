@@ -3,7 +3,6 @@
 
 namespace micropather
 {
-
     const int8_t OffsetCoordinates[4][4][8] = {
         // HEX_ODDR
         { {
