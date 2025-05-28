@@ -34,8 +34,8 @@ I'd love to hear about your projects! Please share your released projects that u
 
 Now supports multi-maps thanks to [Alexander Zinov](https://github.com/sashkent3)
 
-- Introduces new functions for setting up multimaps: `astar.new_map_id()`, `astar.delete_map()` 
-- All functions now accept `map_id` as an optional parameter  
+- Introduces new functions for setting up multi-maps: `astar.new_map_id()`, `astar.delete_map()` 
+- Relevant functions now accept `map_id` as an optional parameter  
 - Lua annotations have been added 
 - Minor code refactoring
 
@@ -95,7 +95,9 @@ If you want to support multi-maps, you should create a new map ID to pass to the
 
 ---
 
-### astar.delete_map(`map_id)
+### astar.delete_map(`map_id`)
+
+This method removes everything related to the `map_id` and frees the memory.
 
 **PARAMETERS**. 
 
