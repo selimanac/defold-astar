@@ -17,3 +17,4 @@ compiler_commands.json
 /.editor_settings
 build_config.json
 .clang-format
+*.der

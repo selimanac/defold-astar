@@ -347,14 +347,22 @@ static int astar_resize_path(lua_State* L)
     return 0;
 }
 
+static void clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr)
+{
+    if (mapDataPtr != NULL)
+    {
+        MapData* mapData = *mapDataPtr;
+
+        mapData->map.Clear();
+        delete mapData;
+        *mapDataPtr = NULL;
+    }
+}
+
 static int astar_reset(lua_State* L)
 {
-    dmHashTable16<MapData*>::Iterator it = maps.GetIterator();
-    while (it.Next())
-    {
-        MapData* mapData = it.GetValue();
-        mapData->map.Clear();
-    }
+    maps.Iterate(&clearMaps, (void*)NULL);
+    maps.Clear();
 
     return 0;
 }
@@ -574,17 +582,6 @@ dmExtension::Result AppInitializeAstar(dmExtension::AppParams* params)
 {
     maps.SetCapacity(1);
     return dmExtension::RESULT_OK;
-}
-
-void clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr)
-{
-    if (mapDataPtr != NULL)
-    {
-        MapData* mapData = *mapDataPtr;
-        mapData->map.Clear();
-        delete mapData;
-        *mapDataPtr = NULL;
-    }
 }
 
 dmExtension::Result AppFinalizeAstar(dmExtension::AppParams* params)
