@@ -47,8 +47,8 @@ I'd love to hear about your projects! Please share your released projects that u
 ![Pixel Commander](/.github/pixel_commander.png?raw=true)
 
 **Developer:** [Faraz Ahmad Khan](https://zalmay.com/)  
-**iOS:** https://apps.apple.com/gb/app/pixel-commander-pixel-games/id6748568011  
-**Android:** https://play.google.com/store/apps/details?id=com.farazkhandev.pixelcommander  
+**App Store:** https://apps.apple.com/gb/app/pixel-commander-pixel-games/id6748568011  
+**Google Play:** https://play.google.com/store/apps/details?id=com.farazkhandev.pixelcommander  
 
 
 ### Skull Horde
