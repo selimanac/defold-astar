@@ -120,7 +120,7 @@ static int astar_setup(lua_State* L)
     bool _mapVFlip = false;
     if (lua_isboolean(L, 8))
     {
-        bool _mapVFlip = lua_toboolean(L, 8);
+        _mapVFlip = lua_toboolean(L, 8);
     }
 
     uint16_t _mapId = luaL_optinteger(L, 9, defaultMapId);
