@@ -618,4 +618,4 @@ dmExtension::Result InitializeAstar(dmExtension::Params* params)
     return dmExtension::RESULT_OK;
 }
 
-DM_DECLARE_EXTENSION(Astar, LIB_NAME, AppInitializeAstar, AppFinalizeAstar, InitializeAstar, 0, 0, 0)
+DM_DECLARE_EXTENSION(astar, LIB_NAME, AppInitializeAstar, AppFinalizeAstar, InitializeAstar, 0, 0, 0)
