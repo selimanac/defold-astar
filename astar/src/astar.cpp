@@ -595,7 +595,7 @@ dmExtension::Result AppInitializeAstar(dmExtension::AppParams* params)
 {
     if (maps.Capacity() == 0)
     {
-        maps.SetCapacity(1, 1); // for 1.9.7 sdk compability
+        maps.SetCapacity(1, 1);
     }
     else
     {
