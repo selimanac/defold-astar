@@ -22,6 +22,20 @@ static const uint16_t                  defaultMapId = 0;
 static uint16_t                        nextMapId = defaultMapId;
 static dmHashTable<uint16_t, MapData*> maps;
 
+static void clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr);
+
+static void reset_maps_state()
+{
+    if (maps.Capacity() == 0)
+    {
+        return;
+    }
+
+    maps.Iterate(&clearMaps, (void*)NULL);
+    maps.Clear();
+    nextMapId = defaultMapId;
+}
+
 //
 static MapData* get_or_create_mapdata(uint16_t mapId)
 {
@@ -361,8 +375,7 @@ static void clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr)
 
 static int astar_reset(lua_State* L)
 {
-    maps.Iterate(&clearMaps, (void*)NULL);
-    maps.Clear();
+    reset_maps_state();
 
     return 0;
 }
@@ -580,14 +593,21 @@ static void LuaInit(lua_State* L)
 
 dmExtension::Result AppInitializeAstar(dmExtension::AppParams* params)
 {
-    maps.SetCapacity(1, 1); // for 1.9.7 sdk compability
+    if (maps.Capacity() == 0)
+    {
+        maps.SetCapacity(1, 1); // for 1.9.7 sdk compability
+    }
+    else
+    {
+        reset_maps_state();
+    }
+    nextMapId = defaultMapId;
     return dmExtension::RESULT_OK;
 }
 
 dmExtension::Result AppFinalizeAstar(dmExtension::AppParams* params)
 {
-    maps.Iterate(&clearMaps, (void*)NULL);
-    maps.Clear();
+    reset_maps_state();
     return dmExtension::RESULT_OK;
 }
 
@@ -598,4 +618,4 @@ dmExtension::Result InitializeAstar(dmExtension::Params* params)
     return dmExtension::RESULT_OK;
 }
 
-DM_DECLARE_EXTENSION(astar, LIB_NAME, AppInitializeAstar, 0, InitializeAstar, 0, 0, 0)
+DM_DECLARE_EXTENSION(Astar, LIB_NAME, AppInitializeAstar, AppFinalizeAstar, InitializeAstar, 0, 0, 0)
