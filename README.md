@@ -46,6 +46,16 @@ I'd love to hear about your projects! Please share your released projects that u
 
 ## Games using A-Star
 
+### SuperWEIRD
+
+![SuperWEIRD](/.github/super.png?raw=true)
+
+
+**Developer:** [Luden.io](https://luden.io/)  
+**itch.io:** https://ludenio.itch.io/superweird-alpha  
+**Steam:** https://store.steampowered.com/app/3818770/SuperWEIRD_Automation_Roguelite/  
+
+
 ### Pixel Commander
 
 ![Pixel Commander](/.github/pixel_commander.png?raw=true)
