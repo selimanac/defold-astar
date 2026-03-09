@@ -18,6 +18,10 @@ Basic tilemap, entities, and multi-map example: https://github.com/selimanac/def
 
 [benjames](https://github.com/benjames-171)'s xfire:  https://github.com/benjames-171/xfire/tree/main
 
+## Tutorial
+
+[A* (A Star) Path Finding - Monster/NPC Follow (AStar Module)](https://www.youtube.com/watch?v=-0CMnaoW_3Y)  from [Asatte Games](https://www.youtube.com/@AsatteGames)
+
 ## Forum
 
 https://forum.defold.com/t/a-native-extension/  
