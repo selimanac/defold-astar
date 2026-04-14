@@ -1,0 +1,323 @@
+syntax = "proto2";
+package dmRigDDF;
+
+import "ddf/ddf_extensions.proto";
+import "ddf/ddf_math.proto";
+
+option java_package = "com.dynamo.rig.proto";
+option java_outer_classname = "Rig";
+
+
+enum AlphaMode {
+    ALPHA_MODE_OPAQUE  = 0;
+    ALPHA_MODE_MASK    = 1;
+    ALPHA_MODE_BLEND   = 2;
+    ALPHA_MODE_MAX_ENUM= 3;
+}
+
+// We're not really using the Image concept at runtime
+// message Image
+// {
+//     optional string name = 1;
+//     optional string uri = 2;
+//     optional string mimetype = 3;
+//     optional uint32 target = 4;
+//     optional uint32 index = 5;
+//     repeated bytes  buffer = 6;
+// }
+
+message Sampler
+{
+    optional string name        = 1;
+    optional uint32 index       = 2;                      // Index into the scene samplers list
+    optional uint32 magFilter   = 3 [default = 9728]; // Required=No, No default, NEAREST=9728, LINEAR=9729
+    optional uint32 minFilter   = 4 [default = 9728]; // Required=No, No default, NEAREST=9728, LINEAR=9729
+    optional uint32 wrapS       = 5 [default = 10497];    // Required=No, Default=10497 (REPEAT)
+    optional uint32 wrapT       = 6 [default = 10497];    // Required=No, Default=10497 (REPEAT)
+}
+
+message Texture
+{
+    optional string name     = 1;
+    optional int32  index    = 2 [default = -1]; // Index into the scene textures, -1 if not set
+    optional string path     = 3;                // Technically an Image struct
+    optional Sampler sampler = 4;
+}
+
+// KHR_texture_transform: https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_texture_transform/README.md
+message TextureTransform
+{
+    optional float offset_x = 1 [default = 0];
+    optional float offset_y = 2 [default = 0];
+    optional float scale_x  = 3 [default = 1];
+    optional float scale_y  = 4 [default = 1];
+    optional float rotation = 5 [default = 0];
+    optional int32 texcoord = 6 [default = -1]; // -1 if not set
+}
+
+message TextureView
+{
+    optional Texture texture    = 1;
+    optional int32 texcoord     = 2 [default = -1]; // It should be set
+    optional float scale        = 3 [default = 1];
+    optional TextureTransform transform = 4;
+}
+
+// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material-pbrmetallicroughness
+message PbrMetallicRoughness
+{
+    optional TextureView        baseColorTexture        = 1;
+    optional TextureView        metallicRoughnessTexture= 2;
+    optional dmMath.Vector4One  baseColorFactor         = 3;
+    optional float              metallicFactor          = 4 [default = 1];
+    optional float              roughnessFactor         = 5 [default = 1];
+}
+
+// https://kcoley.github.io/glTF/extensions/2.0/Khronos/KHR_materials_pbrSpecularGlossiness/
+message PbrSpecularGlossiness
+{
+    optional TextureView diffuseTexture             = 1;
+    optional TextureView specularGlossinessTexture  = 2;
+    optional dmMath.Vector4One diffuseFactor        = 3;
+    optional dmMath.Vector3One specularFactor       = 4;
+    optional float glossinessFactor                 = 5 [default = 1];
+}
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_clearcoat/README.md
+message Clearcoat
+{
+    optional TextureView clearcoatTexture           = 1;
+    optional TextureView clearcoatRoughnessTexture  = 2;
+    optional TextureView clearcoatNormalTexture     = 3;
+    optional float clearcoatFactor                  = 4 [default = 0];
+    optional float clearcoatRoughnessFactor         = 5 [default = 0];
+}
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_transmission/README.md
+message Transmission
+{
+    optional TextureView transmissionTexture    = 1;
+    optional float transmissionFactor           = 2 [default = 0];
+}
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_ior/README.md
+message Ior
+{
+    optional float ior = 1 [default = 0];
+}
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_specular/README.md#extending-materials
+message Specular
+{
+    optional TextureView specularTexture            = 1;
+    optional TextureView specularColorTexture       = 2;
+    optional dmMath.Vector3One specularColorFactor  = 3;
+    optional float specularFactor                   = 4 [default = 1];
+}
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_volume/README.md#properties
+message Volume
+{
+    optional TextureView thicknessTexture       = 1;
+    optional float thicknessFactor              = 2 [default = 0];
+    optional dmMath.Vector3One attenuationColor = 3;
+    optional float attenuationDistance          = 4 [default = -1.0]; // +Infinity as default
+};
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_sheen/README.md#sheen
+message Sheen
+{
+    optional TextureView sheenColorTexture      = 1;
+    optional TextureView sheenRoughnessTexture  = 2;
+    optional dmMath.Vector3 sheenColorFactor    = 3;
+    optional float sheenRoughnessFactor         = 4 [default = 0];
+};
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md#parameters
+message EmissiveStrength
+{
+    optional float emissiveStrength = 1 [default = 1];
+}
+
+// https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_materials_iridescence/README.md#properties
+message Iridescence
+{
+    optional float iridescenceFactor                 = 1 [default = 0];
+    optional TextureView iridescenceTexture          = 2;
+    optional float iridescenceIor                    = 3 [default = 1.3];
+    optional float iridescenceThicknessMin           = 4 [default = 100.0];
+    optional float iridescenceThicknessMax           = 5 [default = 400.0];
+    optional TextureView iridescenceThicknessTexture = 6;
+};
+
+// https://registry.khronos.org/glTF/specs/2.0/glTF-2.0.html#reference-material
+message Material
+{
+    optional string name                                    = 1;
+    optional uint32 index                                   = 2; // index into the scene materials
+    optional bool isSkinned                                 = 3; // set if the material is skinned
+    optional PbrMetallicRoughness pbrMetallicRoughness      = 4;
+    optional PbrSpecularGlossiness pbrSpecularGlossiness    = 5;
+    optional Clearcoat clearcoat                            = 6;
+    optional Ior ior                                        = 7;
+    optional Specular specular                              = 8;
+    optional Sheen sheen                                    = 9;
+    optional Transmission transmission                      = 10;
+    optional Volume volume                                  = 11;
+    optional EmissiveStrength emissiveStrength              = 12;
+    optional Iridescence iridescence                        = 13;
+    optional TextureView normalTexture                      = 14;
+    optional TextureView occlusionTexture                   = 15;
+    optional TextureView emissiveTexture                    = 16;
+    optional dmMath.Vector3 emissiveFactor                  = 17;
+    optional float alphaCutoff                              = 18 [default = 0.5];
+    optional AlphaMode alphaMode                            = 19 [default = ALPHA_MODE_OPAQUE];
+    optional bool doubleSided                               = 20 [default = false];
+    optional bool unlit                                     = 21 [default = false];
+    optional uint64 materialHash                            = 22;
+}
+
+message Bone
+{
+    option (struct_align) = true;
+
+    // 0xFFFFFFFF means no parent
+    required uint32 parent = 1;
+    required uint64 id = 2;         // the bone name hash
+    required string name = 3;       // For easier debugging at runtime
+    required dmMath.Transform local = 4 [(field_align)=true]; // Deprecated/unused (only in unit test=)
+    required dmMath.Transform world = 5 [(field_align)=true]; // Deprecated/unused
+    required dmMath.Transform inverse_bind_pose = 6 [(field_align)=true];
+
+    optional float length = 7 [default = 0];
+}
+
+message IK
+{
+    required uint64 id = 1;
+    required uint32 parent = 2;
+    required uint32 child = 3;
+    required uint32 target = 4;
+    optional bool positive = 5 [default = true];
+    optional float mix = 6 [default = 1.0];
+}
+
+message Skeleton
+{
+    repeated Bone bones = 1;
+    repeated IK iks = 2;
+}
+
+message AnimationTrack
+{
+    required uint64 bone_id = 1;        // the bone name hash
+    // x0, y0, z0, ...
+    repeated float positions = 2;
+    // x0, x0, z0, w0, …
+    repeated float rotations = 3;
+    // x0, y0, z0, …
+    repeated float scale = 4;
+}
+
+message EventKey
+{
+    required float t = 1;
+    optional int32 integer = 2 [default = 0];
+    optional float float = 3 [default = 0.0];
+    optional uint64 string = 4 [default = 0];
+}
+
+message EventTrack
+{
+    required uint64 event_id = 1;
+    repeated EventKey keys = 2;
+}
+
+message RigAnimation
+{
+    required uint64 id = 1;
+    required float duration = 2;
+    required float sample_rate = 3;
+    repeated AnimationTrack tracks = 4;
+    repeated EventTrack event_tracks = 5;
+}
+
+message AnimationSet
+{
+    repeated RigAnimation animations = 1;
+}
+
+message AnimationInstanceDesc
+{
+    required string animation = 1  [(resource)=true];
+}
+
+message AnimationSetDesc
+{
+    repeated AnimationInstanceDesc animations = 1;
+    optional string skeleton = 2;
+}
+
+enum IndexBufferFormat
+{
+    INDEXBUFFER_FORMAT_16 = 0;
+    INDEXBUFFER_FORMAT_32 = 1;
+}
+
+message Mesh
+{
+    required dmMath.Vector3 aabb_min        = 1;
+    required dmMath.Vector3 aabb_max        = 2;
+
+    repeated float positions                = 3;
+    repeated float normals                  = 4;
+    repeated float tangents                 = 5;
+    repeated float colors                   = 6;
+    repeated float texcoord0                = 7;
+    optional uint32 num_texcoord0_components = 8; // max 3
+    repeated float texcoord1                = 9;
+    optional uint32 num_texcoord1_components = 10; // max 3
+
+    optional bytes  indices                 = 11; // indices for interleaved vertex buffer
+    optional IndexBufferFormat indices_format = 12; // format of values in indices
+
+    // w00, w01, w02, w03, w10, … (only specified for skinned meshes)
+    repeated float weights = 13;
+    // i00, i01, i02, i03, i10, … (only specified for skinned meshes)
+    repeated uint32 bone_indices = 14;
+
+    optional uint32 material_index = 15; // index into the mesh set material list
+
+}
+
+message Model // E.g. the Node in the Scene
+{
+    option (struct_align) = true;
+
+    required dmMath.Transform   local       = 1 [(field_align)=true];
+    required uint64             id          = 2;    // E.g. "torso", "head". Or simply "character"
+    repeated Mesh               meshes      = 3;
+    // If set, then this model should be transformed as a child of the bone
+    optional uint64             bone_id     = 4 [default = 0]; // hash of bone id
+}
+
+message MeshSet
+{
+    repeated Model          models         = 1; // There may be more than one object in a scene
+    repeated Material       materials      = 2;
+
+    // List of bone names that represent the order of the bone influences.
+    // Not used for Spine rigs since they don't have support for external skeletons.
+    repeated uint64         bone_list      = 3;
+    // Max number of bones used in any of the meshes (in the bone_indices list)
+    optional uint32         max_bone_count = 4;
+}
+
+// Public api (dmSDK)
+message RigScene
+{
+    optional string     skeleton        = 1 [(resource)=true];
+    optional string     animation_set   = 2 [(resource)=true];
+    required string     mesh_set        = 3 [(resource)=true];
+    optional string     texture_set     = 4 [(resource)=true];
+}

@@ -1,0 +1,141 @@
+syntax = "proto2";
+package dmLiveUpdateDDF;
+
+import "ddf/ddf_extensions.proto";
+import "ddf/ddf_math.proto";
+
+option java_package = "com.dynamo.liveupdate.proto";
+option java_outer_classname = "Manifest";
+
+/*
+ * This enum specifies the supported hashing algorithms both for resource
+ * verification and signature generation.
+ *
+ * The HASH_UNKNOWN value is used as a default that cannot be used to create
+ * a manifest. This forces every call to explicitly specify the hashing
+ * algorithm in order to avoid accidentally downgrading the strength of a hash
+ * or unnecessarily using a too expensive hash.
+ */
+enum HashAlgorithm {
+    HASH_UNKNOWN    = 0;
+    HASH_MD5        = 1;
+    HASH_SHA1       = 2;
+    HASH_SHA256     = 3;
+    HASH_SHA512     = 4;
+}
+
+/*
+ * This enum specifies the supported encryption algorithms used for signature
+ * generation.
+ *
+ * The SIGN_UNKNOWN value is used as a default that cannot be used to create
+ * a manifest. This forces every call to explicitly specify the encryption
+ * algorithm.
+ */
+enum SignAlgorithm {
+    SIGN_UNKNOWN    = 0;
+    SIGN_RSA        = 1;
+}
+
+/*
+ * Enum flag on manifest resource entry
+ */
+enum ResourceEntryFlag {
+    BUNDLED    = 1;
+    EXCLUDED   = 2;
+    ENCRYPTED  = 4;
+    COMPRESSED = 8;
+}
+
+/*
+ * Stores a hashdigest
+ */
+message HashDigest {
+    required bytes              data = 1;
+}
+
+/*
+ * The manifest header specifies general information about the manifest.
+ *
+ * - resource_hash_algorithm  : The algorithm that should be used when hashing
+ *                              resources
+ * - signature_hash_algorithm : The algorithm that should be used when hashing
+ *                              content for signature verification
+ * - signature_sign_algorithm : The algorithm that should be used for
+ *                              encryption and decryption for signature
+ *                              verification
+ * - project_identifier       : An identifier meant to uniquely identify a
+ *                              project to avoid loading a manifest for a
+ *                              different project. This is implemented as the
+ *                              SHA-1 hash of the project title
+ */
+message ManifestHeader {
+    required HashAlgorithm      resource_hash_algorithm = 1     [default = HASH_SHA256];
+    required HashAlgorithm      signature_hash_algorithm = 2    [default = HASH_SHA256];
+    required SignAlgorithm      signature_sign_algorithm = 3    [default = SIGN_RSA];
+    required HashDigest         project_identifier = 4;
+}
+
+/*
+ * An entry that is produced for each resource that is part of the manifest.
+ *
+ * - hash                     : The hash of the resource data. This is used to
+ *                              index each resource in the archive with their
+ *                              actual hash.
+ * - url                      : The URL that is used by the engine to identify a resource
+ * - url_hash                 : The URL in hashed for, for faster lookups and efficient storage
+ * - size                     : The size of the uncompressed resource
+ * - compressed_size          : The size of the compressed resource. 0xFFFFFFFF if it's uncompressed
+ * - flags                    : A set of bit flasg or type ResourceEntryFlag. E.g. Is used for manifest
+ *                              verification to determine if a resource is expected
+ *                              to be in the bundle or not.
+ * - dependants               : A list of resources (url hashes) that are required
+ *                              to load the current resource. A Collection that
+ *                              is childed to a CollectionProxy is not
+ *                              considered a dependant since it is not required
+ *                              to load the parent Collection of the
+ *                              CollectionProxy.
+ */
+message ResourceEntry {
+    required HashDigest         hash = 1;
+    required string             url = 2;
+    required uint64             url_hash = 3;
+    required uint32             size = 4;
+    required uint32             compressed_size = 5;
+    required uint32             flags = 6 [default = 0]; // ResourceEntryFlag
+    repeated uint64             dependants = 7;
+}
+
+/*
+ * The manifest data that contains all information about the project.
+ *
+ * - header                   : The manifest header
+ * - engine_versions          : A list of engine versions (specified by their
+ *                              hash and same as sys.engine_info) that are able
+ *                              to support the manifest. An engine should only
+ *                              attempt to initialize with a manifest that has
+ *                              that version of the engine listed as a
+ *                              supported engine.
+ * - resources                : The resources that are part of the manifest.
+ */
+message ManifestData {
+    required ManifestHeader     header = 1;
+    repeated HashDigest         engine_versions = 2;
+    repeated ResourceEntry      resources = 3;
+}
+
+/*
+ * The Manifest. This is separate from ManifestData to easily create a
+ * signature of the manifest content. Nothing other than a single ManifestData
+ * entry and a single signature should be part of this entity.
+ * - data                   : A data blob, which is in fact a ManifestData message
+ * - signature              : A cryptographic signature of the data byte array
+ * - version                : A version number to quickly identify if we can read/support the file
+ * - archive_identifier     : (deprecated) a hash of the corresponding archive index
+ */
+message ManifestFile {
+    required bytes              data = 1;
+    required bytes              signature = 2;
+    optional bytes              archive_identifier = 3; // deprecated
+    required uint32             version = 4 [default = 0]; // dmResource::MANIFEST_VERSION
+}

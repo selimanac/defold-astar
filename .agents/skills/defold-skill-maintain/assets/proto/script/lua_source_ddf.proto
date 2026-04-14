@@ -1,0 +1,27 @@
+syntax = "proto2";
+package dmLuaDDF;
+
+option java_package = "com.dynamo.script.proto";
+option java_outer_classname = "Lua";
+
+message LuaSource
+{
+    // HTML platforms uses script (vanilla lua), all
+    // other platforms uses bytecode instead.
+    optional bytes script                               = 1;
+
+    // Path to the original file; used for debugging.
+    // Note that if bytecode is supplied from LuaJIT it will contain embedded
+    // chunk names that override this file name and this field is not used.
+    required string filename                            = 2;
+
+    // Used when we bundle bytecode+delta AND when we bundle
+    // only bytecode for a single architecture
+    optional bytes bytecode                             = 3;
+    optional bytes delta                                = 5;
+
+    // These two are used when we bundle without a bytecode
+    // delta and for more than one architecture
+    optional bytes bytecode_32                          = 6;
+    optional bytes bytecode_64                          = 4;
+}

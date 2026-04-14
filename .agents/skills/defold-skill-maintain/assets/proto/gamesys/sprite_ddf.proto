@@ -1,0 +1,137 @@
+syntax = "proto2";
+package dmGameSystemDDF;
+
+import "ddf/ddf_extensions.proto";
+import "ddf/ddf_math.proto";
+import "graphics/graphics_ddf.proto";
+
+option java_package = "com.dynamo.gamesys.proto";
+option java_outer_classname = "Sprite";
+
+message SpriteTexture
+{
+    required string sampler     = 1;
+    required string texture     = 2 [(resource)=true];
+}
+
+message SpriteDesc
+{
+    enum BlendMode
+    {
+        BLEND_MODE_ALPHA     = 0 [(displayName) = "Alpha"];
+        BLEND_MODE_ADD       = 1 [(displayName) = "Add"];
+        BLEND_MODE_ADD_ALPHA = 2 [(displayName) = "Add Alpha (Deprecated)"];
+        BLEND_MODE_MULT      = 3 [(displayName) = "Multiply"];
+        BLEND_MODE_SCREEN    = 4 [(displayName) = "Screen"];
+    }
+
+    enum SizeMode
+    {
+        SIZE_MODE_MANUAL    = 0 [(displayName) = "Manual"];
+        SIZE_MODE_AUTO      = 1 [(displayName) = "Auto"];
+    }
+
+    optional string tile_set            = 1 [(resource)=true];  // Deprecated
+    required string default_animation   = 2;
+    optional string material            = 3 [(resource)=true, default="/builtins/materials/sprite.material"];
+    optional BlendMode blend_mode       = 4 [default = BLEND_MODE_ALPHA];
+    optional dmMath.Vector4 slice9      = 5;
+    optional dmMath.Vector4 size        = 6;
+    optional SizeMode size_mode         = 7 [default = SIZE_MODE_AUTO];
+    optional float offset               = 8 [default = 0.0];
+    optional float playback_rate        = 9 [default = 1.0];
+
+    repeated dmGraphics.VertexAttribute attributes = 10;
+
+    repeated SpriteTexture textures     = 11;
+}
+
+/*# Sprite API documentation
+ *
+ * @document
+ * @name Sprite
+ * @namespace sprite
+ * @language Lua
+ */
+
+/*# play a sprite animation
+ *
+ * Post this message to a sprite component to make it play an animation from its tile set.
+ *
+ * @message
+ * @name play_animation
+ * @param id [type:hash] the id of the animation to play
+ * @param offset [type:number] the normalized initial value of the animation cursor when the animation starts playing
+ * @param playback_rate [type:number] the rate with which the animation will be played. Must be positive
+ * @examples
+ *
+ * In the example, it is assumed that the instance of the script has a sprite-component with id "sprite". The sprite itself is assumed to be bound to a tile set with animations "walk" and "jump".
+ *
+ * ```lua
+ * msg.post("#sprite", "play_animation", {id = hash("jump")})
+ * ```
+ */
+message PlayAnimation
+{
+    required uint64 id = 1;
+
+    optional float offset = 2 [default = 0.0];
+    optional float playback_rate = 3 [default = 1.0];
+}
+
+/*# reports that an animation has completed
+ *
+ * This message is sent to the sender of a <code>play_animation</code> message when the
+ * animation has completed.
+ *
+ * Note that this message is sent only for animations that play with the following
+ * playback modes:
+ *
+ * - Once Forward
+ * - Once Backward
+ * - Once Ping Pong
+ *
+ * See [ref:play_animation] for more information and examples of how to use
+ * this message.
+ *
+ * @message
+ * @name animation_done
+ * @param current_tile [type:number] the current tile of the sprite
+ * @param id [type:hash] id of the animation that was completed
+ * @examples
+ *
+ * How to sequence two animations together.
+ *
+ * ```lua
+ * function init(self)
+ *   -- play jump animation at init
+ *   msg.post("#sprite", "play_animation", {id = hash("jump")})
+ * end
+ *
+ * function on_message(self, message_id, message, sender)
+ *   -- check for animation done response
+ *   if message_id == hash("animation_done") then
+ *     -- start the walk animation
+ *     msg.post("#sprite", "play_animation", { id = hash("walk") })
+ *   end
+ * end
+ * ```
+ */
+message AnimationDone
+{
+    required uint32 current_tile = 1;
+    required uint64 id = 2;
+}
+
+/* Function wrapper documented in gamesys_script.cpp */
+message SetFlipHorizontal
+{
+    required uint32 flip = 1;
+}
+
+/* Function wrapper documented in gamesys_script.cpp */
+message SetFlipVertical
+{
+    required uint32 flip = 1;
+}
+

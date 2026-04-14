@@ -1,0 +1,239 @@
+syntax = "proto2";
+package dmGamesysDDF;
+
+import "ddf/ddf_extensions.proto";
+import "ddf/ddf_math.proto";
+
+option java_package = "com.dynamo.gamesys.proto";
+option java_outer_classname = "Camera";
+
+/*# Camera API documentation
+ *
+ * Messages to control camera components and camera focus.
+ *
+ * @document
+ * @name Camera
+ * @namespace camera
+ * @language Lua
+ */
+
+// NOTE: Enum values must correspond to the enum values in dmRender::OrthoZoomMode
+// Don't forget to change engine/render/src/render/render.h if you change here
+// Orthographic camera zoom modes
+enum OrthoZoomMode
+{
+    ORTHO_MODE_FIXED        = 0[(displayName) = "Fixed"]; // Use orthographic_zoom as-is
+    ORTHO_MODE_AUTO_FIT     = 1[(displayName) = "Auto Fit"]; // Fit original display area (fit)
+    ORTHO_MODE_AUTO_COVER   = 2[(displayName) = "Auto Cover"]; // Fill original display area (cover)
+}
+
+message CameraDesc
+{
+    required float  aspect_ratio            = 1;
+    required float  fov                     = 2;
+    required float  near_z                  = 3;
+    required float  far_z                   = 4;
+    optional uint32 auto_aspect_ratio       = 5 [default = 0];
+    optional uint32 orthographic_projection = 6 [default = 0];
+    optional float  orthographic_zoom       = 7 [default = 1.0];
+    optional OrthoZoomMode orthographic_mode  = 8 [default = ORTHO_MODE_FIXED];
+}
+
+/*# sets camera properties
+ * <p>
+ * Post this message to a camera-component to set its properties at run-time.
+ * </p>
+ *
+ * @message
+ * @name set_camera
+ * @param aspect_ratio [type:number] aspect ratio of the screen (width divided by height)
+ * @param fov [type:number] field of view of the lens, measured as the angle in radians between the right and left edge
+ * @param near_z [type:number] position of the near clipping plane (distance from camera along relative z)
+ * @param far_z [type:number] position of the far clipping plane (distance from camera along relative z)
+ * @param orthographic_projection [type:boolean] set to use an orthographic projection
+ * @param orthographic_zoom [type:number] zoom level when the camera is using an orthographic projection
+ * @param orthographic_mode [type:number] orthographic zoom behavior when orthographic_projection is enabled
+ * @examples
+ *
+ * In the examples, it is assumed that the instance of the script has a camera-component with id "camera".
+ *
+ * ```lua
+ * msg.post("#camera", "set_camera", {aspect_ratio = 16/9, fov = math.pi * 0.5, near_z = 0.1, far_z = 500})
+ * ```
+ */
+message SetCamera
+{
+    required float  aspect_ratio            = 1;
+    required float  fov                     = 2;
+    required float  near_z                  = 3;
+    required float  far_z                   = 4;
+    optional uint32 orthographic_projection = 5 [default = 0];
+    optional float  orthographic_zoom       = 6 [default = 1.0];
+    optional OrthoZoomMode orthographic_mode  = 7 [default = ORTHO_MODE_FIXED];
+}
+
+/** DEPRECATED! makes the receiving camera become the active camera
+ *
+ * Post this message to a camera-component to activate it.
+ *
+ * Several cameras can be active at the same time, but only the camera that was last activated will be used for rendering.
+ * When the camera is deactivated (see <code>release_camera_focus</code>), the previously activated camera will again be used for rendering automatically.
+ *
+ * The reason it is called "camera focus" is the similarity to how acquiring input focus works (see <code>acquire_input_focus</code>).
+ *
+ * @message
+ * @name acquire_camera_focus
+ * @examples
+ *
+ * In the examples, it is assumed that the instance of the script has a camera-component with id "camera".
+ *
+ * ```lua
+ * msg.post("#camera", "acquire_camera_focus")
+ * ```
+ */
+message AcquireCameraFocus {}
+
+/** DEPRECATED! deactivates the receiving camera
+ * <p>
+ * Post this message to a camera-component to deactivate it. The camera is then removed from the active cameras.
+ * See <code>acquire_camera_focus</code> for more information how the active cameras are used in rendering.
+ * </p>
+ *
+ * @message
+ * @name release_camera_focus
+ * @examples
+ *
+ * In the examples, it is assumed that the instance of the script has a camera-component with id "camera".
+ *
+ * ```lua
+ * msg.post("#camera", "release_camera_focus")
+ * ```
+ */
+message ReleaseCameraFocus {}
+
+/*# [type:float] camera fov
+ *
+ * Vertical field of view of the camera.
+ * The type of the property is float.
+ *
+ * @name fov
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local fov = go.get("#camera", "fov")
+ *   go.set("#camera", "fov", fov + 0.1)
+ *   go.animate("#camera", "fov", go.PLAYBACK_ONCE_PINGPONG, 1.2, go.EASING_LINEAR, 1)
+ * end
+ * ```
+ */
+
+ /*# [type:float] camera near_z
+ *
+ * Camera frustum near plane.
+ * The type of the property is float.
+ *
+ * @name near_z
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local near_z = go.get("#camera", "near_z")
+ *   go.set("#camera", "near_z", 10)
+ * end
+ * ```
+ */
+
+/*# [type:float] camera far_z
+ *
+ * Camera frustum far plane.
+ * The type of the property is float.
+ *
+ * @name far_z
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local far_z = go.get("#camera", "far_z")
+ *   go.set("#camera", "far_z", 10)
+ * end
+ * ```
+ */
+
+/*# [type:float] camera orthographic_zoom
+ *
+ * Zoom level when using an orthographic projection.
+ * The type of the property is float.
+ *
+ * @name orthographic_zoom
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local orthographic_zoom = go.get("#camera", "orthographic_zoom")
+ *   go.set("#camera", "orthographic_zoom", 2.0)
+ *   go.animate("#camera", "orthographic_zoom", go.PLAYBACK_ONCE_PINGPONG, 0.5, go.EASING_INOUTQUAD, 2)
+ * end
+ * ```
+ */
+
+/*# [type:float] camera projection
+ *
+ * [mark:READ ONLY] The calculated projection matrix of the camera.
+ * The type of the property is matrix4.
+ *
+ * @name projection
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local projection = go.get("#camera", "projection")
+ * end
+ * ```
+ */
+
+/*# [type:float] camera view
+ *
+ * [mark:READ ONLY] The calculated view matrix of the camera.
+ * The type of the property is matrix4.
+ *
+ * @name view
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local view = go.get("#camera", "view")
+ * end
+ * ```
+ */
+
+/*# [type:float] camera aspect ratio
+ *
+ * The ratio between the frustum width and height. Used when calculating the
+ * projection of a perspective camera.
+ * The type of the property is number.
+ *
+ * @name aspect_ratio
+ * @property
+ *
+ * @examples
+ *
+ * ```lua
+ * function init(self)
+ *   local aspect_ratio = go.get("#camera", "aspect_ratio")
+ *   go.set("#camera", "aspect_ratio", 1.2)
+ * end
+ * ```
+ */
