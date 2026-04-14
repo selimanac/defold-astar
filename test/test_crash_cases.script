@@ -88,7 +88,7 @@ local function test_double_setup()
 	astar.setup(map_width, map_height, astar.DIRECTION_EIGHT, 20, 8)
 	astar.set_map(world)
 	astar.set_costs(costs)
-	local status, _, _, _ = astar.solve(5, 1, 1, 4)
+	local status, _, _, _ = astar.solve(5, 1, 4, 4)
 	if status == astar.SOLVED then
 		pass("double setup — no crash, solve succeeds")
 	else
@@ -119,7 +119,7 @@ local function test_normal_solve()
 	astar.setup(map_width, map_height, astar.DIRECTION_EIGHT, 20, 8)
 	astar.set_map(world)
 	astar.set_costs(costs)
-	local status, size, total_cost, path = astar.solve(5, 1, 1, 4)
+	local status, size, total_cost, path = astar.solve(5, 1, 4, 4)
 	if status == astar.SOLVED then
 		pass("normal solve — SOLVED, size=" .. tostring(size) .. " cost=" .. tostring(total_cost))
 	else
