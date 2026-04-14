@@ -22,9 +22,9 @@ static const uint16_t                  defaultMapId = 0;
 static uint16_t                        nextMapId = defaultMapId;
 static dmHashTable<uint16_t, MapData*> maps;
 
-static void clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr);
+static void                            clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr);
 
-static void reset_maps_state()
+static void                            reset_maps_state()
 {
     if (maps.Capacity() == 0)
     {
@@ -128,7 +128,7 @@ static int astar_setup(lua_State* L)
         return 0;
     }
 
-    bool     _cache = true;
+    bool _cache = true;
     if (lua_isboolean(L, 6))
     {
         _cache = lua_toboolean(L, 6);
@@ -436,8 +436,7 @@ static int astar_set_at(lua_State* L)
 
 static int astar_solve(lua_State* L)
 {
-    int      top = lua_gettop(L);
-    uint8_t  i = 3;
+    DM_LUA_STACK_CHECK(L, 4);
 
     int16_t  fromX = luaL_checkint(L, 1);
     int16_t  fromY = luaL_checkint(L, 2);
@@ -446,8 +445,7 @@ static int astar_solve(lua_State* L)
     MapData* mapData = get_map(L, 5);
     if (mapData == NULL)
     {
-        assert(top == lua_gettop(L));
-        return 0;
+        return DM_LUA_ERROR("Map doesn't exist. Use astar.setup() to create it.");
     }
 
     mapData->map.SetPathFromTo(fromX - mapData->zero, fromY - mapData->zero, toX - mapData->zero, toY - mapData->zero);
@@ -467,10 +465,10 @@ static int astar_solve(lua_State* L)
     lua_pushinteger(L, mapData->pathSize);
     lua_pushnumber(L, mapData->pathTotalCost);
 
+    lua_createtable(L, mapData->pathSize, 0);
+
     if (mapData->pathSize > 1)
     {
-        i++;
-        lua_createtable(L, mapData->pathSize, 0);
         int newTable = lua_gettop(L);
 
         for (int ii = 0; ii < mapData->pathSize; ii++)
@@ -492,14 +490,12 @@ static int astar_solve(lua_State* L)
         }
     }
 
-    assert(top + i == lua_gettop(L));
-    return i;
+    return 4;
 }
 
 static int astar_solve_near(lua_State* L)
 {
-    int      top = lua_gettop(L);
-    uint8_t  i = 2;
+    DM_LUA_STACK_CHECK(L, 3);
 
     int16_t  x = luaL_checkint(L, 1);
     int16_t  y = luaL_checkint(L, 2);
@@ -507,8 +503,7 @@ static int astar_solve_near(lua_State* L)
     MapData* mapData = get_map(L, 4);
     if (mapData == NULL)
     {
-        assert(top == lua_gettop(L));
-        return 0;
+        return DM_LUA_ERROR("Map doesn't exist. Use astar.setup() to create it.");
     }
 
     mapData->map.SetPathFrom(x - mapData->zero, y - mapData->zero);
@@ -526,10 +521,10 @@ static int astar_solve_near(lua_State* L)
     lua_pushinteger(L, mapData->pathSolved);
     lua_pushinteger(L, mapData->pathSize);
 
+    lua_createtable(L, mapData->pathSize, 0);
+
     if (mapData->pathSize > 1)
     {
-        i++;
-        lua_createtable(L, mapData->pathSize, 0);
         int newTable = lua_gettop(L);
 
         for (int ii = 0; ii < mapData->pathSize; ii++)
@@ -554,8 +549,7 @@ static int astar_solve_near(lua_State* L)
         }
     }
 
-    assert(top + i == lua_gettop(L));
-    return i;
+    return 3;
 }
 
 static const luaL_reg Module_methods[] = { { "solve_near", astar_solve_near },
@@ -576,8 +570,7 @@ static const luaL_reg Module_methods[] = { { "solve_near", astar_solve_near },
                                            { "map_vflip", astar_map_vflip },
                                            { "map_hflip", astar_map_hflip },
                                            { "new_map_id", astar_new_map_id },
-                                           { "delete_map", astar_delete_map },
-                                           { 0, 0 }
+                                           { "delete_map", astar_delete_map }
 
 };
 
