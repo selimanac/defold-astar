@@ -94,6 +94,7 @@ static void delete_map(uint16_t mapId)
 
 static int astar_new_map_id(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 1);
     uint16_t _mapId = new_map_id();
     lua_pushinteger(L, _mapId);
     return 1;
@@ -101,6 +102,7 @@ static int astar_new_map_id(lua_State* L)
 
 static int astar_delete_map(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     uint16_t _mapId = luaL_checkinteger(L, 1);
     delete_map(_mapId);
     return 0;
@@ -113,11 +115,18 @@ static void use_zero(MapData* mapData, bool _zero)
 
 static int astar_setup(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     uint16_t _worldWidth = luaL_checkint(L, 1);
     uint16_t _worldHeight = luaL_checkint(L, 2);
     uint8_t  _worldDirection = luaL_checkint(L, 3);
     uint16_t _allocate = luaL_checkint(L, 4);
     uint16_t _typicalAdjacent = luaL_checkint(L, 5);
+
+    if (_allocate == 0)
+    {
+        dmLogError("astar.setup: allocate must be > 0\n");
+        return 0;
+    }
 
     bool     _cache = true;
     if (lua_isboolean(L, 6))
@@ -151,6 +160,7 @@ static int astar_setup(lua_State* L)
 
 static int astar_map_vflip(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     MapData* mapData = get_map(L, 1);
     if (mapData == NULL)
     {
@@ -162,6 +172,7 @@ static int astar_map_vflip(lua_State* L)
 
 static int astar_map_hflip(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     MapData* mapData = get_map(L, 1);
     if (mapData == NULL)
     {
@@ -173,6 +184,7 @@ static int astar_map_hflip(lua_State* L)
 
 static int astar_set_map_type(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     uint8_t  _mapType = luaL_checkint(L, 1);
     MapData* mapData = get_map(L, 2);
     if (mapData == NULL)
@@ -185,6 +197,7 @@ static int astar_set_map_type(lua_State* L)
 
 static int astar_set_map(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     luaL_checktype(L, 1, LUA_TTABLE);
     MapData* mapData = get_map(L, 2);
     if (mapData == NULL)
@@ -213,6 +226,7 @@ static int astar_set_map(lua_State* L)
 
 static int astar_print_map(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     MapData* mapData = get_map(L, 1);
     if (mapData == NULL)
     {
@@ -224,6 +238,7 @@ static int astar_print_map(lua_State* L)
 
 static int astar_use_entities(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     bool     _useEntities = lua_toboolean(L, 1);
     MapData* mapData = get_map(L, 2);
     if (mapData == NULL)
@@ -236,6 +251,7 @@ static int astar_use_entities(lua_State* L)
 
 static int astar_use_zero(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     bool     _zero = lua_toboolean(L, 1);
     MapData* mapData = get_map(L, 2);
     if (mapData == NULL)
@@ -248,6 +264,7 @@ static int astar_use_zero(lua_State* L)
 
 static int astar_set_entities(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     luaL_checktype(L, 1, LUA_TTABLE);
 
     size_t size = lua_objlen(L, 1);
@@ -280,6 +297,7 @@ static int astar_set_entities(lua_State* L)
 
 static int astar_set_costs(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     luaL_checktype(L, 1, LUA_TTABLE);
 
     MapData* mapData = get_map(L, 2);
@@ -341,6 +359,7 @@ static int astar_set_costs(lua_State* L)
 
 static int astar_reset_cache(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     MapData* mapData = get_map(L, 1);
     if (mapData == NULL)
     {
@@ -352,6 +371,7 @@ static int astar_reset_cache(lua_State* L)
 
 static int astar_resize_path(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     MapData* mapData = get_map(L, 1);
     if (mapData == NULL)
     {
@@ -375,6 +395,7 @@ static void clearMaps(void* context, const uint16_t* key, MapData** mapDataPtr)
 
 static int astar_reset(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     reset_maps_state();
 
     return 0;
@@ -382,6 +403,7 @@ static int astar_reset(lua_State* L)
 
 static int astar_get_at(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 1);
     int16_t  pathX = luaL_checkint(L, 1);
     int16_t  pathY = luaL_checkint(L, 2);
     MapData* mapData = get_map(L, 3);
@@ -397,6 +419,7 @@ static int astar_get_at(lua_State* L)
 
 static int astar_set_at(lua_State* L)
 {
+    DM_LUA_STACK_CHECK(L, 0);
     int16_t  pathX = luaL_checkint(L, 1);
     int16_t  pathY = luaL_checkint(L, 2);
     int      value = luaL_checkint(L, 3);
@@ -413,6 +436,7 @@ static int astar_set_at(lua_State* L)
 
 static int astar_solve(lua_State* L)
 {
+    int      top = lua_gettop(L);
     uint8_t  i = 3;
 
     int16_t  fromX = luaL_checkint(L, 1);
@@ -422,6 +446,7 @@ static int astar_solve(lua_State* L)
     MapData* mapData = get_map(L, 5);
     if (mapData == NULL)
     {
+        assert(top == lua_gettop(L));
         return 0;
     }
 
@@ -467,11 +492,13 @@ static int astar_solve(lua_State* L)
         }
     }
 
+    assert(top + i == lua_gettop(L));
     return i;
 }
 
 static int astar_solve_near(lua_State* L)
 {
+    int      top = lua_gettop(L);
     uint8_t  i = 2;
 
     int16_t  x = luaL_checkint(L, 1);
@@ -480,6 +507,7 @@ static int astar_solve_near(lua_State* L)
     MapData* mapData = get_map(L, 4);
     if (mapData == NULL)
     {
+        assert(top == lua_gettop(L));
         return 0;
     }
 
@@ -526,6 +554,7 @@ static int astar_solve_near(lua_State* L)
         }
     }
 
+    assert(top + i == lua_gettop(L));
     return i;
 }
 

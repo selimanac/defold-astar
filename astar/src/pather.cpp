@@ -181,6 +181,8 @@ namespace micropather
 
     void Map::SetEntityCount(size_t size)
     {
+        free(entities);
+        entities = NULL;
         entitiesSize = size;
         entities = (uint8_t*)malloc(sizeof(uint8_t) * entitiesSize);
     }
@@ -444,12 +446,26 @@ namespace micropather
             for (unsigned int a = 0; a < tileCount; a = a + 1)
             {
                 free(Costs[a].costs);
+                Costs[a].costs = NULL;
             }
         }
 
         free(Costs);
+        Costs = NULL;
         free(entities);
+        entities = NULL;
         free(world);
+        world = NULL;
+
+        tileCount     = 0;
+        worldSize     = 0;
+        worldWidth    = 0;
+        worldHeight   = 0;
+        entitiesSize  = 0;
+        totalCost     = 0.0f;
+        result        = 0;
+        getEntity     = false;
+        getNearEntities = false;
 
         if (pather != NULL)
         {
