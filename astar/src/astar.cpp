@@ -122,9 +122,24 @@ static int astar_setup(lua_State* L)
     uint16_t _allocate = luaL_checkint(L, 4);
     uint16_t _typicalAdjacent = luaL_checkint(L, 5);
 
+    if (_worldWidth == 0)
+    {
+        dmLogError("astar.setup: map_width must be > 0\n");
+        return 0;
+    }
+    if (_worldHeight == 0)
+    {
+        dmLogError("astar.setup: map_height must be > 0\n");
+        return 0;
+    }
     if (_allocate == 0)
     {
         dmLogError("astar.setup: allocate must be > 0\n");
+        return 0;
+    }
+    if (_typicalAdjacent == 0)
+    {
+        dmLogError("astar.setup: typical_adjacent must be > 0\n");
         return 0;
     }
 
