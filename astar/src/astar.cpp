@@ -585,11 +585,10 @@ static const luaL_reg Module_methods[] = { { "solve_near", astar_solve_near },
                                            { "map_vflip", astar_map_vflip },
                                            { "map_hflip", astar_map_hflip },
                                            { "new_map_id", astar_new_map_id },
-                                           { "delete_map", astar_delete_map }
+                                           { "delete_map", astar_delete_map },
+                                           { 0, 0 } };
 
-};
-
-static void LuaInit(lua_State* L)
+static void           LuaInit(lua_State* L)
 {
     int top = lua_gettop(L);
 
