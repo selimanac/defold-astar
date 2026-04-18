@@ -1,0 +1,179 @@
+name: Build with bob
+
+on:
+  workflow_call:
+    inputs:
+      ubuntu_runner:
+        required: false
+        type: string
+        description: "Which Ubuntu runner should use"
+        default: ubuntu-latest
+      macos_runner:
+        required: false
+        type: string
+        description: "Which MacOS runner should use"
+        default: macOS-latest
+      windows_runner:
+        required: false
+        type: string
+        description: "Which Windows runner should use"
+        default: windows-latest
+      build_server:
+        required: false
+        type: string
+        description: "Build server url"
+        default: "https://build.defold.com/"
+      channel:
+        required: false
+        type: string
+        description: "Which Defold version use to build. Possible values: alpha, beta, stable"
+        default: alpha
+      bob_version_filename:
+        required: false
+        type: string
+        description: "JSON filename withi Bob versions"
+        default: "info.json"
+      additonal_build_options:
+        required: false
+        type: string
+        description: "Additional options passed to build command"
+        default: "--archive"
+      additonal_bundle_options:
+        required: false
+        type: string
+        description: "Additional options passed to bundle command"
+      ignored_platforms:
+        required: false
+        type: string
+        description: "JSON-like string with list of ignored platforms" # [{"platform": "wasm_pthread-web"}, {"platform": "js-web"}]
+        default: "[]"
+
+jobs:
+  build_with_bob:
+    strategy:
+      matrix:
+        platform: [ armv7-android, arm64-android, x86_64-linux, arm64-linux, js-web, wasm-web, wasm_pthread-web ]
+        exclude: ${{ fromJSON(inputs.ignored_platforms) }}
+      fail-fast: false
+    runs-on: ${{ inputs.ubuntu_runner }}
+    name: Build
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: "25"
+          architecture: x64
+          distribution: "temurin"
+
+      - name: Get Defold version
+        id: defold_version
+        run: |
+          TMPVAR=`curl -s http://d.defold.com/${{ inputs.channel }}/${{ inputs.bob_version_filename }} | jq -r '.sha1'`
+          echo "defold_version=${TMPVAR}" >> $GITHUB_OUTPUT
+          echo "Found version ${TMPVAR}"
+
+      - name: Download bob.jar
+        run: |
+          wget -q http://d.defold.com/archive/${{ inputs.channel }}/${{ steps.defold_version.outputs.defold_version }}/bob/bob.jar
+          java -jar bob.jar --version
+
+      - name: Installing Shared Library Dependencies
+        run: |
+          echo "Remove after we've fixed the headless build for plugins"
+          sudo apt-get update
+          sudo apt-get install -y libopenal-dev freeglut3-dev libgl-dev libglx-dev libegl-dev
+
+      - name: Resolve libraries
+        run: java -jar bob.jar resolve
+      - name: Build
+        run: java -jar bob.jar --platform=${{ matrix.platform }} --architectures ${{ matrix.platform }} build --build-server=${{
+          inputs.build_server }} ${{ inputs.additonal_build_options }}
+      - name: Bundle
+        run: java -jar bob.jar --platform=${{ matrix.platform }} --architectures ${{ matrix.platform }} bundle ${{
+          inputs.additonal_bundle_options }}
+      - name: Print build log on failure
+        if: failure()
+        run: cat build/*/log.txt 2>/dev/null || echo "No log file found"
+
+  build_with_bob_windows:
+    strategy:
+      matrix:
+        platform: [ x86_64-win32, x86-win32 ]
+        exclude: ${{ fromJSON(inputs.ignored_platforms) }}
+      fail-fast: false
+    runs-on: ${{ inputs.windows_runner }}
+    name: Build
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: "25"
+          architecture: x64
+          distribution: "temurin"
+
+      - name: Get Defold version
+        id: defold_version
+        run: |
+          TMPVAR=`curl -s http://d.defold.com/${{ inputs.channel }}/${{ inputs.bob_version_filename }} | jq -r '.sha1'`
+          echo "defold_version=${TMPVAR}" >> $GITHUB_OUTPUT
+          echo "Found version ${TMPVAR}"
+        shell: bash
+
+      - name: Download bob.jar
+        run: |
+          curl -s -o bob.jar http://d.defold.com/archive/${{ inputs.channel }}/${{ steps.defold_version.outputs.defold_version }}/bob/bob.jar
+          java -jar bob.jar --version
+
+      - name: Resolve libraries
+        run: java -jar bob.jar resolve
+      - name: Build
+        run: java -jar bob.jar --platform=${{ matrix.platform }} --architectures ${{ matrix.platform }} build --build-server=${{
+          inputs.build_server }} ${{ inputs.additonal_build_options }}
+      - name: Bundle
+        run: java -jar bob.jar --platform=${{ matrix.platform }} --architectures ${{ matrix.platform }} bundle ${{
+          inputs.additonal_bundle_options }}
+      - name: Print build log on failure
+        if: failure()
+        run: cat build/*/log.txt 2>/dev/null || echo "No log file found"
+        shell: bash
+
+  # macOS is not technically needed for building, but we want to test bundling as well, since we're also testing the manifest merging
+  build_with_bob_macos:
+    strategy:
+      matrix:
+        platform: [ arm64-macos, x86_64-macos, arm64-ios ]
+        exclude: ${{ fromJSON(inputs.ignored_platforms) }}
+      fail-fast: false
+    runs-on: ${{ inputs.macos_runner }}
+    name: Build
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: "25"
+          architecture: x64
+          distribution: "temurin"
+
+      - name: Get Defold version
+        id: defold_version
+        run: |
+          TMPVAR=`curl -s http://d.defold.com/${{ inputs.channel }}/${{ inputs.bob_version_filename }} | jq -r '.sha1'`
+          echo "defold_version=${TMPVAR}" >> $GITHUB_OUTPUT
+          echo "Found version ${TMPVAR}"
+
+      - name: Download bob.jar
+        run: |
+          wget -q http://d.defold.com/archive/${{ inputs.channel }}/${{ steps.defold_version.outputs.defold_version }}/bob/bob.jar
+          java -jar bob.jar --version
+
+      - name: Resolve libraries
+        run: java -jar bob.jar resolve
+      - name: Build
+        run: java -jar bob.jar --platform=${{ matrix.platform }} --architectures ${{ matrix.platform }} build --build-server=${{
+          inputs.build_server }} ${{ inputs.additonal_build_options }}
+      - name: Bundle
+        run: java -jar bob.jar --platform=${{ matrix.platform }} --architectures ${{ matrix.platform }} bundle ${{
+          inputs.additonal_bundle_options }}
+      - name: Print build log on failure
+        if: failure()
+        run: cat build/*/log.txt 2>/dev/null || echo "No log file found"
